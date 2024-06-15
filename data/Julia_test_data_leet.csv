@@ -1,0 +1,5640 @@
+Statement,Solution
+"151. Reverse Words in a String
+ ---
+ 
+ Given an input string `s`, reverse the order of the **words**.
+ 
+ A **word** is defined as a sequence of non-space characters. The **words** in
+ `s` will be separated by at least one space.
+ 
+ Return _a string of the words in reverse order concatenated by a single
+ space._
+ 
+ **Note** that `s` may contain leading or trailing spaces or multiple spaces
+ between two words. The returned string should only have a single space
+ separating the words. Do not include any extra spaces.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: s = ""the sky is blue""
+     Output: ""blue is sky the""
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: s = ""  hello world  ""
+     Output: ""world hello""
+     Explanation: Your reversed string should not contain leading or trailing spaces.
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: s = ""a good   example""
+     Output: ""example good a""
+     Explanation: You need to reduce multiple spaces between two words to a single space in the reversed string.
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: s = ""  Bob    Loves  Alice   ""
+     Output: ""Alice Loves Bob""
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: s = ""Alice does not even like bob""
+     Output: ""bob like even not does Alice""
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= s.length <= 104`
+   * `s` contains English letters (upper-case and lower-case), digits, and spaces `' '`.
+   * There is **at least one** word in `s`.
+ 
+ 
+ 
+ **Follow up:**
+ 
+   * Could you solve it **in-place** with `O(1)` extra space?","function reverse_words(s::String)
+    s_s = split(s, "" "", keepempty = false)
+    join(reverse(s_s), "" "")
+end"
+"693. Binary Number with Alternating Bits
+ ---
+ 
+ Given a positive integer, check whether it has alternating bits: namely, if
+ two adjacent bits will always have different values.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: n = 5
+     Output: true
+     Explanation: The binary representation of 5 is: 101
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: n = 7
+     Output: false
+     Explanation: The binary representation of 7 is: 111.
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: n = 11
+     Output: false
+     Explanation: The binary representation of 11 is: 1011.
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: n = 10
+     Output: true
+     Explanation: The binary representation of 10 is: 1010.
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: n = 3
+     Output: false
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= n <= 231 - 1`","function has_alternating_bits(n::Int)::Bool
+    a = (n >> 1) ⊻ n
+    return a & (a + 1) == 0
+end"
+"862. Shortest Subarray with Sum at Least K
+ ---
+ 
+ Return the **length** of the shortest, non-empty, contiguous subarray of `A`
+ with sum at least `K`.
+ 
+ If there is no non-empty subarray with sum at least `K`, return `-1`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: A = [1], K = 1
+     Output: 1
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: A = [1,2], K = 4
+     Output: -1
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: A = [2,-1,2], K = 3
+     Output: 3
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `1 <= A.length <= 50000`
+   2. `-10 ^ 5 <= A[i] <= 10 ^ 5`
+   3. `1 <= K <= 10 ^ 9`","function shortest_subarray(A::Vector{Int}, K::Int)
+    dq = Deque{Int}()
+    prex = fill(0, length(A) + 1)
+    cumsum!(@view(prex[2:end]), A)
+    res = typemax(Int)
+    for i in 1:length(prex) 
+        while !isempty(dq) && prex[i] - prex[first(dq)] ≥ K
+            res = min(res, i - first(dq))
+            popfirst!(dq)
+        end
+        while !isempty(dq) && prex[i] ≤ prex[last(dq)] 
+            pop!(dq)
+        end
+        push!(dq, i)
+    end
+    res == typemax(Int) ? -1 : res
+end"
+"436. Find Right Interval
+ ---
+ 
+ You are given an array of `intervals`, where `intervals[i] = [starti, endi]`
+ and each `starti` is **unique**.
+ 
+ The **r** **ight** **  interval** for an interval `i` is an interval `j` such
+ that `startj`` >= endi` and `startj` is  **minimized**.
+ 
+ Return  _an array of   **right interval**  indices for each interval `i`_. If
+ no  **right interval**  exists for interval `i`, then put `-1` at index `i`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: intervals = [[1,2]]
+     Output: [-1]
+     Explanation: There is only one interval in the collection, so it outputs -1.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: intervals = [[3,4],[2,3],[1,2]]
+     Output: [-1,0,1]
+     Explanation: There is no right interval for [3,4].
+     The right interval for [2,3] is [3,4] since start0 = 3 is the smallest start that is >= end1 = 3.
+     The right interval for [1,2] is [2,3] since start1 = 2 is the smallest start that is >= end2 = 2.
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: intervals = [[1,4],[2,3],[3,4]]
+     Output: [-1,2,-1]
+     Explanation: There is no right interval for [1,4] and [3,4].
+     The right interval for [2,3] is [3,4] since start2 = 3 is the smallest start that is >= end1 = 3.
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= intervals.length <= 2 * 104`
+   * `intervals[i].length == 2`
+   * `-106 <= starti <= endi <= 106`
+   * The start point of each interval is **unique**.","function find_right_interval(intervals::Vector{Tuple{Int,Int}})
+    perm = sortperm(intervals; by = x -> x[1])
+    maxb = intervals[perm[end]][1]
+    res = fill(0, length(intervals))
+    for (idx, intv) in intervals |> enumerate
+        res[idx] = intv[2] > maxb ? -1 : searchsortedfirst(perm, intv[2]; by = i -> intervals[i][1])
+    end
+    return res
+end"
+"743. Network Delay Time
+ ---
+ 
+ There are `N` network nodes, labelled `1` to `N`.
+ 
+ Given `times`, a list of travel times as **directed** edges `times[i] = (u, v,
+ w)`, where `u` is the source node, `v` is the target node, and `w` is the time
+ it takes for a signal to travel from source to target.
+ 
+ Now, we send a signal from a certain node `K`. How long will it take for all
+ nodes to receive the signal? If it is impossible, return `-1`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+ ![](https://assets.leetcode.com/uploads/2019/05/23/931_example_1.png)
+ 
+     
+     
+     Input: times = [[2,1,1],[2,3,1],[3,4,1]], N = 4, K = 2
+     Output: 2
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `N` will be in the range `[1, 100]`.
+   2. `K` will be in the range `[1, N]`.
+   3. The length of `times` will be in the range `[1, 6000]`.
+   4. All edges `times[i] = (u, v, w)` will have `1 <= u, v <= N` and `0 <= w <= 100`.","function network_delay_time(times::Vector{Vector{Int}}, n::Int, k::Int)
+    graph = [Tuple{Int,Int}[] for _ in 1:n]
+    for (u, v, t) in times
+        push!(graph[u], (v, t))
+    end
+    pq = PriorityQueue{Int,Int}([(k, 0)])
+    res = Int[]
+    while !isempty(pq)
+        node, d = dequeue_pair!(pq)
+        for (neb, d1) in graph[node]
+            pq[neb] = min(get(pq, neb, typemax(Int)), d + d1)
+        end
+        push!(res, d)
+    end
+    return length(res) == n ? maximum(res) : -1
+end"
+"81. Search in Rotated Sorted Array II
+ ---
+ 
+ Suppose an array sorted in ascending order is rotated at some pivot unknown to
+ you beforehand.
+ 
+ (i.e., `[0,0,1,2,2,5,6]` might become `[2,5,6,0,0,1,2]`).
+ 
+ You are given a target value to search. If found in the array return `true`,
+ otherwise return `false`.
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums = [2,5,6,0,0,1,2], target = 0
+     Output: true
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums = [2,5,6,0,0,1,2], target = 3
+     Output: false
+ 
+ **Follow up:**
+ 
+   * This is a follow up problem to [Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/description/), where `nums` may contain duplicates.
+   * Would this affect the run-time complexity? How and why?","function search_rotate(nums::Vector{Int}, target::Int)::Bool
+    left, right = 1, length(nums)
+    while left <= right
+        mid = (left + right) >> 1
+        (nums[mid] == target) && return true
+        if nums[mid] == nums[left]
+            left += 1
+        elseif nums[mid] <= nums[right]
+            if nums[mid] < target <= nums[right]
+                left = mid + 1
+            else
+                right = mid - 1
+            end
+        else
+            if nums[left] <= target < nums[mid]
+                right = mid - 1
+            else
+                left = mid + 1
+            end
+        end
+    end
+
+    return false
+end"
+"383. Ransom Note
+ ---
+ 
+ Given an arbitrary ransom note string and another string containing letters
+ from all the magazines, write a function that will return true if the ransom
+ note can be constructed from the magazines ; otherwise, it will return false.
+ 
+ Each letter in the magazine string can only be used once in your ransom note.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: ransomNote = ""a"", magazine = ""b""
+     Output: false
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: ransomNote = ""aa"", magazine = ""ab""
+     Output: false
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: ransomNote = ""aa"", magazine = ""aab""
+     Output: true
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * You may assume that both strings contain only lowercase letters.","using DataStructures
+
+function can_construct(ransom_note::String, magazine::String)::Bool
+    words = DefaultDict{Char,Int}(0)
+    for i in magazine
+        words[i] += 1
+    end
+    for i in ransom_note
+        words[i] == 0 && return false
+        words[i] -= 1
+    end
+    return true
+end"
+"1081. Smallest Subsequence of Distinct Characters
+ ---
+ 
+ Return the lexicographically smallest subsequence of `s` that contains all the
+ distinct characters of `s` exactly once.
+ 
+ **Note:** This question is the same as 316:
+ <https://leetcode.comhttps://leetcode.com/problems/remove-duplicate-letters/>
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: s = ""bcabc""
+     Output: ""abc""
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: s = ""cbacdcbc""
+     Output: ""acdb""
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= s.length <= 1000`
+   * `s` consists of lowercase English letters.","function smallest_subsequence(s::String)
+    sascii = codeunits(s)[:] .- Int8('a' - 1)
+    scnt = fill(0, 26)
+    cur_cnt = fill(false, 26)
+    cur = UInt8[]
+    for c in sascii
+        scnt[c] += 1
+    end
+    for c in sascii
+        scnt[c] -= 1
+        cur_cnt[c] && continue
+        while !isempty(cur) && cur[end] > c && scnt[cur[end]] > 0
+            cur_cnt[pop!(cur)] = false
+        end
+        push!(cur, c)
+        cur_cnt[c] = true
+    end
+    return join(cur .+ ('a' - 1))
+end"
+"1008. Construct Binary Search Tree from Preorder Traversal
+ ---
+ 
+ Return the root node of a binary **search** tree that matches the given
+ `preorder` traversal.
+ 
+ _(Recall that a binary search tree  is a binary tree where for every node, any
+ descendant of `node.left` has a value `<` `node.val`, and any descendant of
+ `node.right` has a value `>` `node.val`.  Also recall that a preorder
+ traversal displays the value of the `node` first, then traverses `node.left`,
+ then traverses `node.right`.)_
+ 
+ It's guaranteed that for the given test cases there is always possible to find
+ a binary search tree with the given requirements.
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: [8,5,1,7,10,12]
+     Output: [8,5,10,1,7,null,12]
+     ![](https://assets.leetcode.com/uploads/2019/03/06/1266.png)
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= preorder.length <= 100`
+   * `1 <= preorder[i] <= 10^8`
+   * The values of `preorder` are distinct.","function bst_from_preorder(preorder::AbstractVector{Int})
+    if isempty(preorder)
+        return nothing
+    end
+    i, f = 2, preorder[1]
+    root = TreeNode(f)
+    while i <= length(preorder) && preorder[i] < f
+        i += 1
+    end
+    i -= 1
+    root.left = bst_from_preorder(@view preorder[2:i])
+    root.right = bst_from_preorder(@view preorder[(i + 1):end])
+    return root
+end"
+"669. Trim a Binary Search Tree
+ ---
+ 
+ Given the `root` of a binary search tree and the lowest and highest boundaries
+ as `low` and `high`, trim the tree so that all its elements lies in `[low,
+ high]`. Trimming the tree should **not** change the relative structure of the
+ elements that will remain in the tree (i.e., any node's descendant should
+ remain a descendant). It can be proven that there is a **unique answer**.
+ 
+ Return _the root of the trimmed binary search tree_. Note that the root may
+ change depending on the given bounds.
+ 
+ 
+ 
+ **Example 1:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/09/09/trim1.jpg)
+ 
+     
+     
+     Input: root = [1,0,2], low = 1, high = 2
+     Output: [1,null,2]
+     
+ 
+ **Example 2:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/09/09/trim2.jpg)
+ 
+     
+     
+     Input: root = [3,0,4,null,2,null,null,1], low = 1, high = 3
+     Output: [3,2,null,1]
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: root = [1], low = 1, high = 2
+     Output: [1]
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: root = [1,null,2], low = 1, high = 3
+     Output: [1,null,2]
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: root = [1,null,2], low = 2, high = 4
+     Output: [2]
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * The number of nodes in the tree in the range `[1, 104]`.
+   * `0 <= Node.val <= 104`
+   * The value of each node in the tree is **unique**.
+   * `root` is guaranteed to be a valid binary search tree.
+   * `0 <= low <= high <= 104`","trim_BST(::Nothing, L::Int, R::Int) = nothing
+
+function trim_BST(root::TreeNode{Int}, L::Int, R::Int)
+    root.val > R && return trim_BST(root.left, L, R)
+    root.val < L && return trim_BST(root.right, L, R)
+    root.left = trim_BST(root.left, L, R)
+    root.right = trim_BST(root.right, L, R)
+    return root
+end"
+"1106. Parsing A Boolean Expression
+ ---
+ 
+ Return the result of evaluating a given boolean `expression`, represented as a
+ string.
+ 
+ An expression can either be:
+ 
+   * `""t""`, evaluating to `True`;
+   * `""f""`, evaluating to `False`;
+   * `""!(expr)""`, evaluating to the logical NOT of the inner expression `expr`;
+   * `""&(expr1,expr2,...)""`, evaluating to the logical AND of 2 or more inner expressions `expr1, expr2, ...`;
+   * `""|(expr1,expr2,...)""`, evaluating to the logical OR of 2 or more inner expressions `expr1, expr2, ...`
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: expression = ""!(f)""
+     Output: true
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: expression = ""|(f,t)""
+     Output: true
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: expression = ""&(t,f)""
+     Output: false
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: expression = ""|(&(t,f,t),!(t))""
+     Output: false
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= expression.length <= 20000`
+   * `expression[i]` consists of characters in `{'(', ')', '&', '|', '!', 't', 'f', ','}`.
+   * `expression` is a valid expression representing a boolean, as given in the description.","function parse_bool_expr(expr::String)
+    operations = Char[]
+    operands = Char[]
+    for ch in expr
+        if ch == '!' || ch == '&' || ch == '|'
+            push!(operations, ch)
+        elseif ch == ')'
+            cur_oprs = Char[]
+            while operands[end] != '('
+                push!(cur_oprs, pop!(operands))
+            end
+            pop!(operands)
+            op = pop!(operations)
+            rs = true
+            if op == '|'
+                rs = any(==('t'), cur_oprs)
+            elseif op == '&'
+                rs = all(==('t'), cur_oprs)
+            else
+                rs = cur_oprs[1] != 't'
+            end
+            push!(operands, rs ? 't' : 'f')
+        elseif ch != ','
+            push!(operands, ch)
+        end
+    end
+    return operands[1] == 't' ? true : false
+end"
+"1005. Maximize Sum Of Array After K Negations
+ ---
+ 
+ Given an array `A` of integers, we **must**  modify the array in the following
+ way: we choose an `i` and replace `A[i]` with `-A[i]`, and we repeat this
+ process `K` times in total.  (We may choose the same index `i` multiple
+ times.)
+ 
+ Return the largest possible sum of the array after modifying it in this way.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: A = [4,2,3], K = 1
+     Output: 5
+     Explanation: Choose indices (1,) and A becomes [4,-2,3].
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: A = [3,-1,0,2], K = 3
+     Output: 6
+     Explanation: Choose indices (1, 2, 2) and A becomes [3,1,0,2].
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: A = [2,-3,-1,5,-4], K = 2
+     Output: 13
+     Explanation: Choose indices (1, 4) and A becomes [2,3,-1,5,4].
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `1 <= A.length <= 10000`
+   2. `1 <= K <= 10000`
+   3. `-100 <= A[i] <= 100`","using DataStructures
+function largest_sum_after_k_negations(A::Vector{Int}, K::Int)
+    total = sum(A)
+    pq = BinaryMinHeap(A)
+    for _ in 1:K 
+        m = pop!(pq)
+        total -= 2 * m
+        push!(pq, -m)
+    end
+    total
+end"
+"576. Out of Boundary Paths
+ ---
+ 
+ There is an **m** by **n** grid with a ball. Given the start coordinate
+ **(i,j)** of the ball, you can move the ball to **adjacent** cell or cross the
+ grid boundary in four directions (up, down, left, right). However, you can
+ **at most** move **N** times. Find out the number of paths to move the ball
+ out of grid boundary. The answer may be very large, return it after mod 109 \+
+ 7.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: m = 2, n = 2, N = 2, i = 0, j = 0
+     Output: 6
+     Explanation:
+     ![](https://assets.leetcode.com/uploads/2018/10/13/out_of_boundary_paths_1.png)
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: m = 1, n = 3, N = 3, i = 0, j = 1
+     Output: 12
+     Explanation:
+     ![](https://assets.leetcode.com/uploads/2018/10/12/out_of_boundary_paths_2.png)
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. Once you move the ball out of boundary, you cannot move it back.
+   2. The length and height of the grid is in range [1,50].
+   3. N is in range [0,50].","function find_paths(m, n, N, i, j)
+    dp = zeros(Int, m, n)
+    t = copy(dp)
+    for _ in 1:N
+        inds = CartesianIndices(t)
+        for x in inds
+            v = 0
+            for dir in ((0, -1), (0, 1), (1, 0), (-1, 0))
+                p = x + CartesianIndex(dir)
+                v += p ∈ inds ? t[p] : 1
+            end
+            dp[x] = v
+        end
+        dp, t = t, dp
+    end
+    return t[i, j] % (10^9 + 7)
+end"
+"10. Regular Expression Matching
+ ---
+ 
+ Given an input string (`s`) and a pattern (`p`), implement regular expression
+ matching with support for `'.'` and `'*'` where:` `
+ 
+   * `'.'` Matches any single character.​​​​
+   * `'*'` Matches zero or more of the preceding element.
+ 
+ The matching should cover the **entire** input string (not partial).
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: s = ""aa"", p = ""a""
+     Output: false
+     Explanation: ""a"" does not match the entire string ""aa"".
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: s = ""aa"", p = ""a*""
+     Output: true
+     Explanation:  '*' means zero or more of the preceding element, 'a'. Therefore, by repeating 'a' once, it becomes ""aa"".
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: s = ""ab"", p = "".*""
+     Output: true
+     Explanation:  "".*"" means ""zero or more (*) of any character (.)"".
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: s = ""aab"", p = ""c*a*b""
+     Output: true
+     Explanation:  c can be repeated 0 times, a can be repeated 1 time. Therefore, it matches ""aab"".
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: s = ""mississippi"", p = ""mis*is*p*.""
+     Output: false
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `0 <= s.length <= 20`
+   * `0 <= p.length <= 30`
+   * `s` contains only lowercase English letters.
+   * `p` contains only lowercase English letters, `'.'`, and `'*'`.
+   * It is guaranteed for each appearance of the character `'*'`, there will be a previous valid character to match.","function is_match(s::AbstractString, p::AbstractString)::Bool
+    if isempty(p)
+        isempty(s)
+    elseif length(p) >= 2 && p[2] == '*'
+        if !isempty(s) && (s[1] == p[1] || p[1] == '.')
+            ## case 1: * means 1 or more of previous char, then the first char of `s` and `p` must match.
+            is_match(SubString(s, 2), p)
+        else
+            ## case 2: * means zero of previous char, ignore it and match the rest
+            is_match(s, SubString(p, 3))
+        end
+    else
+        if isempty(s)
+            false  ## length mismatch
+        elseif (s[1] == p[1] || p[1] == '.')
+            is_match(SubString(s, 2), SubString(p, 2))
+        else
+            false  ## first char mismatch
+        end
+    end
+end"
+"1302. Deepest Leaves Sum
+ ---
+ 
+ Given a binary tree, return the sum of values of its deepest leaves.
+ 
+ 
+ 
+ **Example 1:**
+ 
+ **![](https://assets.leetcode.com/uploads/2019/07/31/1483_ex1.png)**
+ 
+     
+     
+     Input: root = [1,2,3,4,5,null,6,7,null,null,null,null,8]
+     Output: 15
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * The number of nodes in the tree is between `1` and `10^4`.
+   * The value of nodes is between `1` and `100`.","function deepest_leaves_sum(root::TreeNode)::Int
+    nodes = [root]
+    while true
+        val = 0
+        for _ in eachindex(nodes)
+            node = popfirst!(nodes)
+            val += node.val
+            isnothing(node.left) || push!(nodes, node.left)
+            isnothing(node.right) || push!(nodes, node.right)
+        end
+        isempty(nodes) && return val
+    end
+end"
+"9. Palindrome Number
+ ---
+ 
+ Determine whether an integer is a palindrome. An integer is a palindrome when
+ it reads the same backward as forward.
+ 
+ **Follow up:** Could you solve it without converting the integer to a string?
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: x = 121
+     Output: true
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: x = -121
+     Output: false
+     Explanation: From left to right, it reads -121. From right to left, it becomes 121-. Therefore it is not a palindrome.
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: x = 10
+     Output: false
+     Explanation: Reads 01 from right to left. Therefore it is not a palindrome.
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: x = -101
+     Output: false
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `-231 <= x <= 231 - 1`","function is_palindrome(x::Int)::Bool
+    if x < 0
+        false
+    else
+        y = x
+        y_reverse = 0
+        while y > 0
+            y, n = divrem(y, 10)
+            y_reverse = y_reverse * 10 + n
+        end
+        x == y_reverse
+    end
+end"
+"504. Base 7
+ ---
+ 
+ Given an integer, return its base 7 string representation.
+ 
+ **Example 1:**  
+ 
+     
+     
+     Input: 100
+     Output: ""202""
+     
+ 
+ **Example 2:**  
+ 
+     
+     
+     Input: -7
+     Output: ""-10""
+     
+ 
+ **Note:** The input will be in range of [-1e7, 1e7].","function convert_to_base7(num::Int)::String
+    num == 0 && return ""0""
+    sign = num < 0 ? -1 : 1
+    num *= sign
+    res = Int[]
+    while num > 0
+        push!(res, num % 7)
+        num ÷= 7
+    end
+    reverse!(res)
+    return sign != -1 ? join(res) : ""-"" * join(res)
+end"
+"1089. Duplicate Zeros
+ ---
+ 
+ Given a fixed length array `arr` of integers, duplicate each occurrence of
+ zero, shifting the remaining elements to the right.
+ 
+ Note that elements beyond the length of the original array are not written.
+ 
+ Do the above modifications to the input array **in place** , do not return
+ anything from your function.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: [1,0,2,3,0,4,5,0]
+     Output: null
+     Explanation: After calling your function, the **input** array is modified to: [1,0,0,2,3,0,0,4]
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: [1,2,3]
+     Output: null
+     Explanation: After calling your function, the **input** array is modified to: [1,2,3]
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `1 <= arr.length <= 10000`
+   2. `0 <= arr[i] <= 9`","function duplicate_zeros!(arr::Vector{Int})
+    len = length(arr)
+    for i in reverse(eachindex(arr))
+        iszero(arr[i]) && insert!(arr, i, 0)
+    end
+    resize!(arr, len)
+    nothing
+end
+
+## add your code here:"
+"904. Fruit Into Baskets
+ ---
+ 
+ In a row of trees, the `i`-th tree produces fruit with type `tree[i]`.
+ 
+ You **start at any tree  of your choice**, then repeatedly perform the
+ following steps:
+ 
+   1. Add one piece of fruit from this tree to your baskets.  If you cannot, stop.
+   2. Move to the next tree to the right of the current tree.  If there is no tree to the right, stop.
+ 
+ Note that you do not have any choice after the initial choice of starting
+ tree: you must perform step 1, then step 2, then back to step 1, then step 2,
+ and so on until you stop.
+ 
+ You have two baskets, and each basket can carry any quantity of fruit, but you
+ want each basket to only carry one type of fruit each.
+ 
+ What is the total amount of fruit you can collect with this procedure?
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: [1,2,1]
+     Output: 3
+     Explanation: We can collect [1,2,1].
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: [0,1,2,2]
+     Output: 3
+     Explanation: We can collect [1,2,2].
+     If we started at the first tree, we would only collect [0, 1].
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: [1,2,3,2,2]
+     Output: 4
+     Explanation: We can collect [2,3,2,2].
+     If we started at the first tree, we would only collect [1, 2].
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: [3,3,3,1,2,1,1,2,3,3,4]
+     Output: 5
+     Explanation: We can collect [1,2,1,1,2].
+     If we started at the first tree or the eighth tree, we would only collect 4 fruits.
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `1 <= tree.length <= 40000`
+   2. `0 <= tree[i] < tree.length`","function total_fruit(fruits::Vector{Int})
+    fruits .+= 1
+    n = length(fruits)
+    cnt = fill(0, n)
+    type_cnt = 0
+    res = 0
+    j = 1
+    for i in 1:n
+        if (cnt[fruits[i]] += 1) == 1
+            type_cnt += 1
+        end
+        while type_cnt > 2
+            if (cnt[fruits[j]] -= 1) == 0
+                type_cnt -= 1
+            end
+            j += 1
+        end
+        res = max(res, i - j + 1)
+    end
+    return res
+end"
+"1561. Maximum Number of Coins You Can Get
+ ---
+ 
+ There are 3n piles of coins of varying size, you and your friends will take
+ piles of coins as follows:
+ 
+   * In each step, you will choose **any  **3 piles of coins (not necessarily consecutive).
+   * Of your choice, Alice will pick the pile with the maximum number of coins.
+   * You will pick the next pile with maximum number of coins.
+   * Your friend Bob will pick the last pile.
+   * Repeat until there are no more piles of coins.
+ 
+ Given an array of integers `piles` where `piles[i]` is the number of coins in
+ the `ith` pile.
+ 
+ Return the maximum number of coins which you can have.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: piles = [2,4,1,2,7,8]
+     Output: 9
+     Explanation: Choose the triplet (2, 7, 8), Alice Pick the pile with 8 coins, you the pile with **7** coins and Bob the last one.
+     Choose the triplet (1, 2, 4), Alice Pick the pile with 4 coins, you the pile with **2** coins and Bob the last one.
+     The maximum number of coins which you can have are: 7 + 2 = 9.
+     On the other hand if we choose this arrangement (1, **2** , 8), (2, **4** , 7) you only get 2 + 4 = 6 coins which is not optimal.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: piles = [2,4,5]
+     Output: 4
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: piles = [9,8,7,6,5,1,2,3,4]
+     Output: 18
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `3 <= piles.length <= 10^5`
+   * `piles.length % 3 == 0`
+   * `1 <= piles[i] <= 10^4`","function max_coins(piles::Vector{Int})
+    len = length(sort!(piles))
+    return sum(piles[i] for i in len ÷ 3 + 1 : 2 : len - 1)
+end"
+"647. Palindromic Substrings
+ ---
+ 
+ Given a string, your task is to count how many palindromic substrings in this
+ string.
+ 
+ The substrings with different start indexes or end indexes are counted as
+ different substrings even they consist of same characters.
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: ""abc""
+     Output: 3
+     Explanation: Three palindromic strings: ""a"", ""b"", ""c"".
+     
+ 
+ 
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: ""aaa""
+     Output: 6
+     Explanation: Six palindromic strings: ""a"", ""a"", ""a"", ""aa"", ""aa"", ""aaa"".
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. The input string length won't exceed 1000.","function count_substrings(s::String)
+    len, res = length(s), 0
+    cu = codeunits(s)
+    for i in 1:len, j in (0, 1)
+        l, r = i, i + j
+        while l >= 1 && r <= len && cu[l] == cu[r]
+            res += 1
+            l -= 1
+            r += 1            
+        end
+    end
+    return res
+end"
+"203. Remove Linked List Elements
+ ---
+ 
+ Remove all elements from a linked list of integers that have value **_val_**.
+ 
+ **Example:**
+ 
+     
+     
+     Input:  1->2->6->3->4->5->6, _**val**_ = 6
+     Output: 1->2->3->4->5","function remove_elements!(
+    head::Union{ListNode,Nothing}, value::Int
+)::Union{ListNode,Nothing}
+    cur = fake_head = ListNode()
+    fake_head.next = head
+    while !isnothing(cur.next)
+        if cur.next.val == value
+            cur.next = cur.next.next
+        else
+            cur = cur.next
+        end
+    end
+    return fake_head.next
+end"
+"204. Count Primes
+ ---
+ 
+ Count the number of prime numbers less than a non-negative number, `n`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: n = 10
+     Output: 4
+     Explanation: There are 4 prime numbers less than 10, they are 2, 3, 5, 7.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: n = 0
+     Output: 0
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: n = 1
+     Output: 0
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `0 <= n <= 5 * 106`","function count_primes(n::Int)
+    if n <= 1
+        return 0   
+    end
+    arr = fill(true, n - 1)
+    for i in 2 : n - 1
+        for j in i ^ 2 : i : (n - 1) 
+            arr[j] = false
+        end
+    end
+    return sum(arr) - 1
+end"
+"101. Symmetric Tree
+ ---
+ 
+ Given a binary tree, check whether it is a mirror of itself (ie, symmetric
+ around its center).
+ 
+ For example, this binary tree `[1,2,2,3,4,4,3]` is symmetric:
+ 
+     
+     
+         1
+        / \
+       2   2
+      / \ / \
+     3  4 4  3
+     
+ 
+ 
+ 
+ But the following `[1,2,2,null,3,null,3]` is not:
+ 
+     
+     
+         1
+        / \
+       2   2
+        \   \
+        3    3
+     
+ 
+ 
+ 
+ **Follow up:** Solve it both recursively and iteratively.","is_symmetric_tree(root::TreeNode{Int})::Bool = is_mirror_tree(root.left, root.right)
+function is_mirror_tree(
+    t1::Union{TreeNode{Int},Nothing}, t2::Union{TreeNode{Int},Nothing}
+)::Bool
+    isnothing(t1) && isnothing(t2) && return true
+    (isnothing(t1) || isnothing(t2)) && return false
+    t1.val != t2.val && return false
+    return is_mirror_tree(t1.left, t2.right) && is_mirror_tree(t1.right, t2.left)
+end"
+"890. Find and Replace Pattern
+ ---
+ 
+ You have a list of `words` and a `pattern`, and you want to know which words
+ in `words` matches the pattern.
+ 
+ A word matches the pattern if there exists a permutation of letters `p` so
+ that after replacing every letter `x` in the pattern with `p(x)`, we get the
+ desired word.
+ 
+ ( _Recall that a permutation of letters is a bijection from letters to
+ letters: every letter maps to another letter, and no two letters map to the
+ same letter._ )
+ 
+ Return a list of the words in `words` that match the given pattern.
+ 
+ You may return the answer in any order.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: words = [""abc"",""deq"",""mee"",""aqq"",""dkd"",""ccc""], pattern = ""abb""
+     Output: [""mee"",""aqq""]
+     Explanation: ""mee"" matches the pattern because there is a permutation {a -> m, b -> e, ...}. 
+     ""ccc"" does not match the pattern because {a -> c, b -> c, ...} is not a permutation,
+     since a and b map to the same letter.
+ 
+ 
+ 
+ **Note:**
+ 
+   * `1 <= words.length <= 50`
+   * `1 <= pattern.length = words[i].length <= 20`","function find_and_replace_pattern(words::Vector{String}, pattern::String)
+    function arr_pattern(s::String)
+        arr_pt = Char[]
+        dct = Dict{Char, Char}()
+        cur_ch = 'a'
+        for ch in s 
+            if !haskey(dct, ch)
+                dct[ch] = cur_ch
+                cur_ch += 1
+            end
+            push!(arr_pt, dct[ch])
+        end
+        arr_pt
+    end
+    res = String[]
+    a_pt = arr_pattern(pattern)
+    for w in words
+        if a_pt == arr_pattern(w)
+            push!(res, w)
+        end
+    end
+    res
+end"
+"4. Median of Two Sorted Arrays
+ ---
+ 
+ Given two sorted arrays `nums1` and `nums2` of size `m` and `n` respectively,
+ return **the median** of the two sorted arrays.
+ 
+ **Follow up:** The overall run time complexity should be `O(log (m+n))`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums1 = [1,3], nums2 = [2]
+     Output: 2.00000
+     Explanation: merged array = [1,2,3] and median is 2.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums1 = [1,2], nums2 = [3,4]
+     Output: 2.50000
+     Explanation: merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5.
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: nums1 = [0,0], nums2 = [0,0]
+     Output: 0.00000
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: nums1 = [], nums2 = [1]
+     Output: 1.00000
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: nums1 = [2], nums2 = []
+     Output: 2.00000
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `nums1.length == m`
+   * `nums2.length == n`
+   * `0 <= m <= 1000`
+   * `0 <= n <= 1000`
+   * `1 <= m + n <= 2000`
+   * `-106 <= nums1[i], nums2[i] <= 106`","function find_median_sorted_arrays(nums1::Vector{Int}, nums2::Vector{Int})::Float64
+    n = length(nums1) + length(nums2)
+    isodd(n) ? nth(nums1, nums2, n ÷ 2 + 1) :
+    (nth(nums1, nums2, n ÷ 2) + nth(nums1, nums2, n ÷ 2 + 1)) / 2
+end
+
+function nth(a, b, k)
+    isempty(a) && return b[k]
+    isempty(b) && return a[k]
+    ia, ib = cld(length(a), 2), cld(length(b), 2)
+    ma, mb = a[ia], b[ib]
+    if ia + ib <= k
+        ma > mb ? nth(a, @view(b[(ib + 1):end]), k - ib) : ## we can safely ignore the first half in b
+        nth(@view(a[(ia + 1):end]), b, k - ia)
+    else
+        ma > mb ? nth(@view(a[1:(ia - 1)]), b, k) : nth(a, @view(b[1:(ib - 1)]), k)
+    end
+end"
+"848. Shifting Letters
+ ---
+ 
+ We have a string `S` of lowercase letters, and an integer array `shifts`.
+ 
+ Call the _shift_ of a letter, the next letter in the alphabet, (wrapping
+ around so that `'z'` becomes `'a'`).
+ 
+ For example, `shift('a') = 'b'`, `shift('t') = 'u'`, and `shift('z') = 'a'`.
+ 
+ Now for each `shifts[i] = x`, we want to shift the first `i+1` letters of `S`,
+ `x` times.
+ 
+ Return the final string after all such shifts to `S` are applied.
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: S = ""abc"", shifts = [3,5,9]
+     Output: ""rpl""
+     Explanation:
+     We start with ""abc"".
+     After shifting the first 1 letters of S by 3, we have ""dbc"".
+     After shifting the first 2 letters of S by 5, we have ""igc"".
+     After shifting the first 3 letters of S by 9, we have ""rpl"", the answer.
+     
+ 
+ **Note:**
+ 
+   1. `1 <= S.length = shifts.length <= 20000`
+   2. `0 <= shifts[i] <= 10 ^ 9`","function shifting_letters(s::String, shift::Vector{Int})::String
+    for i in length(shift):-1:2
+        shift[i - 1] += shift[i]
+    end
+    res = codeunits(s)[:]
+    for i in 1:length(shift)
+        res[i] += shift[i]
+    end
+    return String(res)
+end"
+"1447. Simplified Fractions
+ ---
+ 
+ Given an integer `n`, return a list of all **simplified** fractions between 0
+ and 1 (exclusive) such that the denominator is less-than-or-equal-to `n`. The
+ fractions can be in **any** order.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: n = 2
+     Output: [""1/2""]
+     Explanation: ""1/2"" is the only unique fraction with a denominator less-than-or-equal-to 2.
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: n = 3
+     Output: [""1/2"",""1/3"",""2/3""]
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: n = 4
+     Output: [""1/2"",""1/3"",""1/4"",""2/3"",""3/4""]
+     Explanation: ""2/4"" is not a simplified fraction because it can be simplified to ""1/2"".
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: n = 1
+     Output: []
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= n <= 100`","simplified_fractions(n::Int) = [""$p/$q"" for q in 2:n for p in 1:(q - 1) if gcd(p, q) == 1]"
+"372. Super Pow
+ ---
+ 
+ Your task is to calculate `ab` mod `1337` where `a` is a positive integer and
+ `b` is an extremely large positive integer given in the form of an array.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: a = 2, b = [3]
+     Output: 8
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: a = 2, b = [1,0]
+     Output: 1024
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: a = 1, b = [4,3,3,8,5,2]
+     Output: 1
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: a = 2147483647, b = [2,0,0]
+     Output: 1198
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= a <= 231 - 1`
+   * `1 <= b.length <= 2000`
+   * `0 <= b[i] <= 9`
+   * `b` doesn't contain leading zeros.","function super_pow(a::Int, b::Vector{Int})
+    md, ϕ = 1337, 1140
+    n = length(b)
+    n == 0 && return 1
+    e = 0
+    a %= md
+    for digit in b
+        e = (10 * e + digit) % ϕ 
+    end
+    powermod(a, e, md)
+end"
+"42. Trapping Rain Water
+ ---
+ 
+ Given `n` non-negative integers representing an elevation map where the width
+ of each bar is `1`, compute how much water it can trap after raining.
+ 
+ 
+ 
+ **Example 1:**
+ 
+ ![](https://assets.leetcode.com/uploads/2018/10/22/rainwatertrap.png)
+ 
+     
+     
+     Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
+     Output: 6
+     Explanation: The above elevation map (black section) is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. In this case, 6 units of rain water (blue section) are being trapped.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: height = [4,2,0,3,2,5]
+     Output: 9
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `n == height.length`
+   * `0 <= n <= 3 * 104`
+   * `0 <= height[i] <= 105`","function trap_rain(height::Vector{Int})::Int
+    csum = cumsum(height)
+    pushfirst!(csum, 0)
+    max_pos = argmax(height)
+    len = length(height)
+    res = 0
+    r = 1
+    for i in 2:max_pos
+        if height[i] >= height[r]
+            res += (i > r + 1) * (height[r] * (i - r) - (csum[i] - csum[r]))
+            r = i
+        end
+    end
+    l = len
+    for j in (len - 1):-1:max_pos
+        if height[j] >= height[l]
+            res += (j < l - 1) * (height[l] * (l - j) - (csum[l + 1] - csum[j + 1]))
+            l = j
+        end
+    end
+    return res
+end"
+"931. Minimum Falling Path Sum
+ ---
+ 
+ Given a **square** array of integers `A`, we want the **minimum** sum of a
+ _falling path_ through `A`.
+ 
+ A falling path starts at any element in the first row, and chooses one element
+ from each row.  The next row's choice must be in a column that is different
+ from the previous row's column by at most one.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: [[1,2,3],[4,5,6],[7,8,9]]
+     Output: 12
+     Explanation:
+     The possible falling paths are:
+     
+ 
+   * `[1,4,7], [1,4,8], [1,5,7], [1,5,8], [1,5,9]`
+   * `[2,4,7], [2,4,8], [2,5,7], [2,5,8], [2,5,9], [2,6,8], [2,6,9]`
+   * `[3,5,7], [3,5,8], [3,5,9], [3,6,8], [3,6,9]`
+ 
+ The falling path with the smallest sum is `[1,4,7]`, so the answer is `12`.
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= A.length == A[0].length <= 100`
+   * `-100 <= A[i][j] <= 100`","function min_falling_path_sum(matrix::Vector{Vector{Int}})::Int
+    n = length(matrix)
+    function f(l1, l2)
+        return [
+            num + minimum(l1[max(i - 1, 1):min(i + 1, n)]) for (i, num) in enumerate(l2)
+        ]
+    end
+    return minimum(foldl(f, matrix))
+end"
+"1071. Greatest Common Divisor of Strings
+ ---
+ 
+ For two strings `s` and `t`, we say ""`t` divides `s`"" if and only if `s = t +
+ ... + t`  (`t` concatenated with itself 1 or more times)
+ 
+ Given two strings str1 and str2, return the largest string `x` such that `x`
+ divides both `str1` and `str2`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: str1 = ""ABCABC"", str2 = ""ABC""
+     Output: ""ABC""
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: str1 = ""ABABAB"", str2 = ""ABAB""
+     Output: ""AB""
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: str1 = ""LEET"", str2 = ""CODE""
+     Output: """"
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: str1 = ""ABCDEF"", str2 = ""ABC""
+     Output: """"
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= str1.length <= 1000`
+   * `1 <= str2.length <= 1000`
+   * `str1` and `str2` consist of English uppercase letters.","function gcd_of_strings(str1::String, str2::String)
+    return str1 * str2 == str2 * str1 ? str1[1:gcd(length(str1), length(str2))] : """"
+end"
+"45. Jump Game II
+ ---
+ 
+ Given an array of non-negative integers `nums`, you are initially positioned
+ at the first index of the array.
+ 
+ Each element in the array represents your maximum jump length at that
+ position.
+ 
+ Your goal is to reach the last index in the minimum number of jumps.
+ 
+ You can assume that you can always reach the last index.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums = [2,3,1,1,4]
+     Output: 2
+     Explanation: The minimum number of jumps to reach the last index is 2. Jump 1 step from index 0 to 1, then 3 steps to the last index.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums = [2,3,0,1,4]
+     Output: 2
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= nums.length <= 3 * 104`
+   * `0 <= nums[i] <= 105`","function jump45(nums::Vector{Int})
+    max_pos, len, ed, step = 1, length(nums), 1, 0
+    for i in 1:(len - 1)
+        max_pos = max(max_pos, i + nums[i])
+        if i == ed
+            ed = max_pos
+            step += 1
+        end
+    end
+    return step
+end"
+"112. Path Sum
+ ---
+ 
+ Given a binary tree and a sum, determine if the tree has a root-to-leaf path
+ such that adding up all the values along the path equals the given sum.
+ 
+ **Note:**  A leaf is a node with no children.
+ 
+ **Example:**
+ 
+ Given the below binary tree and `sum = 22`,
+ 
+     
+     
+           **5**
+          **/** \
+         **4**   8
+        **/**   / \
+       **11**  13  4
+      /  **\**      \
+     7    **2**      1
+     
+ 
+ return true, as there exist a root-to-leaf path `5->4->11->2` which sum is 22.","has_path_sum(::Nothing, ::Int) = false
+function has_path_sum(root::TreeNode, target_sum::Int)::Bool
+    root.val == target_sum && isnothing(root.left) && isnothing(root.right) && return true
+    return any(has_path_sum.([root.left, root.right], target_sum - root.val))
+end"
+"331. Verify Preorder Serialization of a Binary Tree
+ ---
+ 
+ One way to serialize a binary tree is to use pre-order traversal. When we
+ encounter a non-null node, we record the node's value. If it is a null node,
+ we record using a sentinel value such as ``.
+ 
+     
+     
+          _9_
+         /   \
+        3     2
+       / \   / \
+      4   1    6
+     / \ / \   / \
+            
+     
+ 
+ For example, the above binary tree can be serialized to the string
+ `""9,3,4,,,1,,,2,,6,,""`, where `` represents a null node.
+ 
+ Given a string of comma separated values, verify whether it is a correct
+ preorder traversal serialization of a binary tree. Find an algorithm without
+ reconstructing the tree.
+ 
+ Each comma separated value in the string must be either an integer or a
+ character `''` representing `null` pointer.
+ 
+ You may assume that the input format is always valid, for example it could
+ never contain two consecutive commas such as `""1,,3""`.
+ 
+ **Example 1:**
+ 
+     
+     
+     Input:""9,3,4,,,1,,,2,,6,,""
+     Output:true
+ 
+ **Example 2:**
+ 
+     
+     
+     Input:""1,""
+     Output:false
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input:""9,,,1""
+     Output:false","function is_valid_serialization(preorder::String)::Bool
+    p = split(preorder, "","")
+    slot = 1
+
+    for node in p
+        slot == 0 && return false
+
+        slot = (node == ""#"") ? (slot - 1) : (slot + 1)
+    end
+
+    return slot == 0
+end"
+"1021. Remove Outermost Parentheses
+ ---
+ 
+ A valid parentheses string is either empty `("""")`, `""("" + A + "")""`, or `A +
+ B`, where `A` and `B` are valid parentheses strings, and `+` represents string
+ concatenation.  For example, `""""`, `""()""`, `""(())()""`, and `""(()(()))""` are
+ all valid parentheses strings.
+ 
+ A valid parentheses string `S` is **primitive** if it is nonempty, and there
+ does not exist a way to split it into `S = A+B`, with `A` and `B` nonempty
+ valid parentheses strings.
+ 
+ Given a valid parentheses string `S`, consider its primitive decomposition: `S
+ = P_1 + P_2 + ... + P_k`, where `P_i` are primitive valid parentheses strings.
+ 
+ Return `S` after removing the outermost parentheses of every primitive string
+ in the primitive decomposition of `S`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: ""(()())(())""
+     Output: ""()()()""
+     Explanation:
+     The input string is ""(()())(())"", with primitive decomposition ""(()())"" + ""(())"".
+     After removing outer parentheses of each part, this is ""()()"" + ""()"" = ""()()()"".
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: ""(()())(())(()(()))""
+     Output: ""()()()()(())""
+     Explanation:
+     The input string is ""(()())(())(()(()))"", with primitive decomposition ""(()())"" + ""(())"" + ""(()(()))"".
+     After removing outer parentheses of each part, this is ""()()"" + ""()"" + ""()(())"" = ""()()()()(())"".
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: ""()()""
+     Output: """"
+     Explanation:
+     The input string is ""()()"", with primitive decomposition ""()"" + ""()"".
+     After removing outer parentheses of each part, this is """" + """" = """".
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `S.length <= 10000`
+   2. `S[i]` is `""(""` or `"")""`
+   3. `S` is a valid parentheses string","function remove_outer_parentheses(s::String)
+    res = """"    
+    cnt = 0
+    for ch in s
+        flg = cnt < 0
+        cnt += ch == '(' ? -1 : 1
+        (flg && cnt < 0) && (res *= ch)
+    end
+    return res
+end"
+"1448. Count Good Nodes in Binary Tree
+ ---
+
+ Given a binary tree `root`, a node _X_ in the tree is named  **good** if in
+ the path from root to _X_ there are no nodes with a value _greater than_ X.
+
+ Return the number of **good** nodes in the binary tree.
+
+
+
+ **Example 1:**
+
+ **![](https://assets.leetcode.com/uploads/2020/04/02/test_sample_1.png)**
+
+
+
+     Input: root = [3,1,4,3,null,1,5]
+     Output: 4
+     Explanation: Nodes in blue are **good**.
+     Root Node (3) is always a good node.
+     Node 4 -> (3,4) is the maximum value in the path starting from the root.
+     Node 5 -> (3,4,5) is the maximum value in the path
+     Node 3 -> (3,1,3) is the maximum value in the path.
+
+ **Example 2:**
+
+ **![](https://assets.leetcode.com/uploads/2020/04/02/test_sample_2.png)**
+
+
+
+     Input: root = [3,3,null,4,2]
+     Output: 3
+     Explanation: Node 2 -> (3, 3, 2) is not good, because ""3"" is higher than it.
+
+ **Example 3:**
+
+
+
+     Input: root = [1]
+     Output: 1
+     Explanation: Root is considered as **good**.
+
+
+
+ **Constraints:**
+
+   * The number of nodes in the binary tree is in the range `[1, 10^5]`.
+   * Each node's value is between `[-10^4, 10^4]`.","function good_nodes(root::TreeNode)::Int
+    dfs(::Nothing, args...) = 0
+    function dfs(n::TreeNode, mval::Int)::Int
+        res = 0
+        (n.val >= mval) && (res += 1)
+        n_max = max(mval, n.val)
+        res += dfs(n.left, n_max)
+        res += dfs(n.right, n_max)
+        return res
+    end
+    return dfs(root, typemin(Int))
+end"
+"217. Contains Duplicate
+ ---
+ 
+ Given an array of integers, find if the array contains any duplicates.
+ 
+ Your function should return true if any value appears at least twice in the
+ array, and it should return false if every element is distinct.
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: [1,2,3,1]
+     Output: true
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: [1,2,3,4]
+     Output: false
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: [1,1,1,3,3,4,3,2,4,2]
+     Output: true","function contains_duplicate(nums::Vector{Int})::Bool
+    hash_table = Int[]
+    for i in nums
+        !(i in hash_table) ? push!(hash_table, i) : return true
+    end
+    return false
+end"
+"769. Max Chunks To Make Sorted
+ ---
+ 
+ Given an array `arr` that is a permutation of `[0, 1, ..., arr.length - 1]`,
+ we split the array into some number of ""chunks"" (partitions), and individually
+ sort each chunk.  After concatenating them, the result equals the sorted
+ array.
+ 
+ What is the most number of chunks we could have made?
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: arr = [4,3,2,1,0]
+     Output: 1
+     Explanation:
+     Splitting into two or more chunks will not return the required result.
+     For example, splitting into [4, 3], [2, 1, 0] will result in [3, 4, 0, 1, 2], which isn't sorted.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: arr = [1,0,2,3,4]
+     Output: 4
+     Explanation:
+     We can split into two chunks, such as [1, 0], [2, 3, 4].
+     However, splitting into [1, 0], [2], [3], [4] is the highest number of chunks possible.
+     
+ 
+ **Note:**
+ 
+   * `arr` will have length in range `[1, 10]`.
+   * `arr[i]` will be a permutation of `[0, 1, ..., arr.length - 1]`.","function max_chunks_to_sorted_ii(arr::Vector{Int})
+    return count(i == num + 1 for (i, num) in enumerate(accumulate(max, arr)))
+end"
+"35. Search Insert Position
+ ---
+ 
+ Given a sorted array of distinct integers and a target value, return the index
+ if the target is found. If not, return the index where it would be if it were
+ inserted in order.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums = [1,3,5,6], target = 5
+     Output: 2
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums = [1,3,5,6], target = 2
+     Output: 1
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: nums = [1,3,5,6], target = 7
+     Output: 4
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: nums = [1,3,5,6], target = 0
+     Output: 0
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: nums = [1], target = 0
+     Output: 0
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= nums.length <= 104`
+   * `-104 <= nums[i] <= 104`
+   * `nums` contains **distinct** values sorted in **ascending** order.
+   * `-104 <= target <= 104`","function search_insert(nums::Vector{Int}, target::Int)::Int
+    left, right = 1, length(nums)
+    while left <= right
+        mid = left + ((right - left) >> 1)
+        if nums[mid] >= target
+            right = mid - 1
+        else
+            left = mid + 1
+        end
+    end
+    return left - 1
+end"
+"6. ZigZag Conversion
+ ---
+ 
+ The string `""PAYPALISHIRING""` is written in a zigzag pattern on a given number
+ of rows like this: (you may want to display this pattern in a fixed font for
+ better legibility)
+ 
+     
+     
+     P   A   H   N
+     A P L S I I G
+     Y   I   R
+     
+ 
+ And then read line by line: `""PAHNAPLSIIGYIR""`
+ 
+ Write the code that will take a string and make this conversion given a number
+ of rows:
+ 
+     
+     
+     string convert(string s, int numRows);
+     
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: s = ""PAYPALISHIRING"", numRows = 3
+     Output: ""PAHNAPLSIIGYIR""
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: s = ""PAYPALISHIRING"", numRows = 4
+     Output: ""PINALSIGYAHRPI""
+     Explanation:
+     P     I    N
+     A   L S  I G
+     Y A   H R
+     P     I
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: s = ""A"", numRows = 1
+     Output: ""A""
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= s.length <= 1000`
+   * `s` consists of English letters (lower-case and upper-case), `','` and `'.'`.
+   * `1 <= numRows <= 1000`","function zig_zag_convert(s::String, num_rows::Int)::String
+    if num_rows == 1 || num_rows >= length(s)
+        s
+    else
+        table = [Char[] for _ in 1:num_rows]
+        i, dir = 1, 1
+        for x in s
+            push!(table[i], x)
+            if i == 1
+                dir = 1
+            elseif i == num_rows
+                dir = -1
+            end
+            i += dir
+        end
+        join(Iterators.flatten(table))
+    end
+end"
+"74. Search a 2D Matrix
+ ---
+ 
+ Write an efficient algorithm that searches for a value in an `m x n` matrix.
+ This matrix has the following properties:
+ 
+   * Integers in each row are sorted from left to right.
+   * The first integer of each row is greater than the last integer of the previous row.
+ 
+ 
+ 
+ **Example 1:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/10/05/mat.jpg)
+ 
+     
+     
+     Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,50]], target = 3
+     Output: true
+     
+ 
+ **Example 2:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/10/05/mat2.jpg)
+ 
+     
+     
+     Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,50]], target = 13
+     Output: false
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: matrix = [], target = 0
+     Output: false
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `m == matrix.length`
+   * `n == matrix[i].length`
+   * `0 <= m, n <= 100`
+   * `-104 <= matrix[i][j], target <= 104`","function search_matrix(matrix::Vector{Vector{Int}}, target::Int)::Bool
+    m, n = length(matrix), length(matrix[1])
+
+    (m == 0 || n == 0) && return false
+    left, right = 1, m * n
+
+    while left <= right
+        mid = left + (right - left) ÷ 2
+        num = matrix[mid ÷ n][mod1(mid, n)]
+        if num == target
+            return true
+        elseif num < target
+            left = mid + 1
+        else
+            right = mid - 1
+        end
+    end
+
+    return false
+end"
+"345. Reverse Vowels of a String
+ ---
+ 
+ Write a function that takes a string as input and reverse only the vowels of a
+ string.
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: ""hello""
+     Output: ""holle""
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: ""leetcode""
+     Output: ""leotcede""
+ 
+ **Note:**  
+ The vowels does not include the letter ""y"".","function reverse_vowels(s::String)
+    in_chars = codeunits(s)[:]
+    indices = Int[]
+    vowels = Set(['a', 'e', 'i', 'o', 'u'])
+    for i in 1:length(s)
+        s[i] ∈ vowels && push!(indices, i)
+    end
+    reverse!(@view(in_chars[indices]))
+    in_chars |> pointer |> unsafe_string
+end"
+"1034. Coloring A Border
+ ---
+ 
+ Given a 2-dimensional `grid` of integers, each value in the grid represents
+ the color of the grid square at that location.
+ 
+ Two squares belong to the same _connected component_ if and only if they have
+ the same color and are next to each other in any of the 4 directions.
+ 
+ The  _border_ of a connected component is all the squares in the connected
+ component that are either 4-directionally adjacent to a square not in the
+ component, or on the boundary of the grid (the first or last row or column).
+ 
+ Given a square at location `(r0, c0)` in the grid and a `color`, color the
+ border of the connected component of that square with the given `color`, and
+ return the final `grid`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: grid = [[1,1],[1,2]], r0 = 0, c0 = 0, color = 3
+     Output: [[3, 3], [3, 2]]
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: grid = [[1,2,2],[2,3,2]], r0 = 0, c0 = 1, color = 3
+     Output: [[1, 3, 3], [2, 3, 3]]
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: grid = [[1,1,1],[1,1,1],[1,1,1]], r0 = 1, c0 = 1, color = 2
+     Output: [[2, 2, 2], [2, 1, 2], [2, 2, 2]]
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `1 <= grid.length <= 50`
+   2. `1 <= grid[0].length <= 50`
+   3. `1 <= grid[i][j] <= 1000`
+   4. `0 <= r0 < grid.length`
+   5. `0 <= c0 < grid[0].length`
+   6. `1 <= color <= 1000`","function color_border(grid::Matrix{Int}, r0::Int, c0::Int, color::Int)
+    visited = fill(false, size(grid))
+    cis = CartesianIndices(grid)
+    dirs = CartesianIndex.(((-1, 0), (1, 0), (0, -1), (0, 1)))
+    cs = CartesianIndex{2}[]
+    function dfs(grid::Matrix{Int}, pos)
+        visited[pos] = true
+        cnt = 0
+        for d in dirs
+            I = pos + d
+            if I ∈ cis && grid[I] == grid[pos]
+                cnt += 1
+                !visited[I] && dfs(grid, I)
+            end
+        end
+        (cnt != 4) && push!(cs, pos) 
+    end
+    dfs(grid, CartesianIndex(r0, c0))
+    for I in cs
+        grid[I] = color
+    end
+    grid
+end"
+"386. Lexicographical Numbers
+ ---
+ 
+ Given an integer _n_ , return 1 - _n_ in lexicographical order.
+ 
+ For example, given 13, return: [1,10,11,12,13,2,3,4,5,6,7,8,9].
+ 
+ Please optimize your algorithm to use less time and space. The input size may
+ be as large as 5,000,000.","function lexical_order(n)
+    res = Vector{Int}(undef, n)
+    cur = 1
+    for i in 1:n
+        res[i] = cur
+        if 10cur <= n
+            cur *= 10
+        else
+            (cur >= n) && (cur ÷= 10)
+            cur += 1
+            while cur % 10 == 0
+                cur ÷= 10
+            end
+        end
+    end
+    return res
+end"
+"974. Subarray Sums Divisible by K
+ ---
+ 
+ Given an array `A` of integers, return the number of (contiguous, non-empty)
+ subarrays that have a sum divisible by `K`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: A = [4,5,0,-2,-3,1], K = 5
+     Output: 7
+     Explanation: There are 7 subarrays with a sum divisible by K = 5:
+     [4, 5, 0, -2, -3, 1], [5], [5, 0], [5, 0, -2, -3], [0], [0, -2, -3], [-2, -3]
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `1 <= A.length <= 30000`
+   2. `-10000 <= A[i] <= 10000`
+   3. `2 <= K <= 10000`","function subarrays_div_by_k(A::Vector{Int}, K::Int)
+    dct = DefaultDict{Int,Int}(0)
+    dct[0] = 1
+    prex = res = 0
+    for num in A
+        prex = mod(num + prex, K)
+        res += dct[prex]
+        dct[prex] += 1
+    end
+    res
+end"
+"1599. Maximum Profit of Operating a Centennial Wheel
+ ---
+ 
+ You are the operator of a Centennial Wheel that has **four gondolas** , and
+ each gondola has room for **up** **to** **four people**. You have the ability
+ to rotate the gondolas **counterclockwise** , which costs you `runningCost`
+ dollars.
+ 
+ You are given an array `customers` of length `n` where `customers[i]` is the
+ number of new customers arriving just before the `ith` rotation (0-indexed).
+ This means you **must rotate the wheel**`i` **times before the**`customers[i]`
+ **customers arrive**. **You cannot make customers wait if there is room in the
+ gondola**. Each customer pays `boardingCost` dollars when they board on the
+ gondola closest to the ground and will exit once that gondola reaches the
+ ground again.
+ 
+ You can stop the wheel at any time, including **before** **serving** **all**
+ **customers**. If you decide to stop serving customers, **all subsequent
+ rotations are free** in order to get all the customers down safely. Note that
+ if there are currently more than four customers waiting at the wheel, only
+ four will board the gondola, and the rest will wait **for the next rotation**.
+ 
+ Return _the minimum number of rotations you need to perform to maximize your
+ profit._ If there is **no scenario** where the profit is positive, return
+ `-1`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/09/09/wheeldiagram12.png)
+ 
+     
+     
+     Input: customers = [8,3], boardingCost = 5, runningCost = 6
+     Output: 3
+     Explanation: The numbers written on the gondolas are the number of people currently there.
+     1. 8 customers arrive, 4 board and 4 wait for the next gondola, the wheel rotates. Current profit is 4 * /$/5 - 1 * /$/6 = /$/14.
+     2. 3 customers arrive, the 4 waiting board the wheel and the other 3 wait, the wheel rotates. Current profit is 8 * /$/5 - 2 * /$/6 = /$/28.
+     3. The final 3 customers board the gondola, the wheel rotates. Current profit is 11 * /$/5 - 3 * /$/6 = /$/37.
+     The highest profit was /$/37 after rotating the wheel 3 times.
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: customers = [10,9,6], boardingCost = 6, runningCost = 4
+     Output: 7
+     Explanation:
+     1. 10 customers arrive, 4 board and 6 wait for the next gondola, the wheel rotates. Current profit is 4 * /$/6 - 1 * /$/4 = /$/20.
+     2. 9 customers arrive, 4 board and 11 wait (2 originally waiting, 9 newly waiting), the wheel rotates. Current profit is 8 * /$/6 - 2 * /$/4 = /$/40.
+     3. The final 6 customers arrive, 4 board and 13 wait, the wheel rotates. Current profit is 12 * /$/6 - 3 * /$/4 = /$/60.
+     4. 4 board and 9 wait, the wheel rotates. Current profit is 16 * /$/6 - 4 * /$/4 = /$/80.
+     5. 4 board and 5 wait, the wheel rotates. Current profit is 20 * /$/6 - 5 * /$/4 = /$/100.
+     6. 4 board and 1 waits, the wheel rotates. Current profit is 24 * /$/6 - 6 * /$/4 = /$/120.
+     7. 1 boards, the wheel rotates. Current profit is 25 * /$/6 - 7 * /$/4 = /$/122.
+     The highest profit was /$/122 after rotating the wheel 7 times.
+     
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: customers = [3,4,0,5,1], boardingCost = 1, runningCost = 92
+     Output: -1
+     Explanation:
+     1. 3 customers arrive, 3 board and 0 wait, the wheel rotates. Current profit is 3 * /$/1 - 1 * /$/92 = -/$/89.
+     2. 4 customers arrive, 4 board and 0 wait, the wheel rotates. Current profit is 7 * /$/1 - 2 * /$/92 = -/$/177.
+     3. 0 customers arrive, 0 board and 0 wait, the wheel rotates. Current profit is 7 * /$/1 - 3 * /$/92 = -/$/269.
+     4. 5 customers arrive, 4 board and 1 waits, the wheel rotates. Current profit is 11 * /$/1 - 4 * /$/92 = -/$/357.
+     5. 1 customer arrives, 2 board and 0 wait, the wheel rotates. Current profit is 13 * /$/1 - 5 * /$/92 = -/$/447.
+     The profit was never positive, so return -1.
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: customers = [10,10,6,4,7], boardingCost = 3, runningCost = 8
+     Output: 9
+     Explanation:
+     1. 10 customers arrive, 4 board and 6 wait, the wheel rotates. Current profit is 4 * /$/3 - 1 * /$/8 = /$/4.
+     2. 10 customers arrive, 4 board and 12 wait, the wheel rotates. Current profit is 8 * /$/3 - 2 * /$/8 = /$/8.
+     3. 6 customers arrive, 4 board and 14 wait, the wheel rotates. Current profit is 12 * /$/3 - 3 * /$/8 = /$/12.
+     4. 4 customers arrive, 4 board and 14 wait, the wheel rotates. Current profit is 16 * /$/3 - 4 * /$/8 = /$/16.
+     5. 7 customers arrive, 4 board and 17 wait, the wheel rotates. Current profit is 20 * /$/3 - 5 * /$/8 = /$/20.
+     6. 4 board and 13 wait, the wheel rotates. Current profit is 24 * /$/3 - 6 * /$/8 = /$/24.
+     7. 4 board and 9 wait, the wheel rotates. Current profit is 28 * /$/3 - 7 * /$/8 = /$/28.
+     8. 4 board and 5 wait, the wheel rotates. Current profit is 32 * /$/3 - 8 * /$/8 = /$/32.
+     9. 4 board and 1 waits, the wheel rotates. Current profit is 36 * /$/3 - 9 * /$/8 = /$/36.
+     10. 1 board and 0 wait, the wheel rotates. Current profit is 37 * /$/3 - 10 * /$/8 = /$/31.
+     The highest profit was /$/36 after rotating the wheel 9 times.
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `n == customers.length`
+   * `1 <= n <= 105`
+   * `0 <= customers[i] <= 50`
+   * `1 <= boardingCost, runningCost <= 100`","function min_operations_max_profit(customers::Vector{Int}, boarding_cost::Int, running_cost::Int)
+    prof, maxp, res, wait_cnt = 0, 0, -1, 0
+    turn = 1
+    while wait_cnt != 0 || turn <= length(customers)
+        wait_cnt += turn <= length(customers) ? customers[turn] : 0
+        up_cnt = min(wait_cnt, 4)
+        wait_cnt -= up_cnt
+        prof += up_cnt * boarding_cost - running_cost
+        if prof > maxp
+            maxp = prof
+            res = turn
+        end
+        turn += 1
+    end
+    return res
+end"
+"1556. Thousand Separator
+ ---
+ 
+ Given an integer `n`, add a dot (""."") as the thousands separator and return it
+ in string format.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: n = 987
+     Output: ""987""
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: n = 1234
+     Output: ""1.234""
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: n = 123456789
+     Output: ""123.456.789""
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: n = 0
+     Output: ""0""
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `0 <= n < 2^31`","function thousand_separator(n::Int)
+    s = string(n)
+    r = length(s) % 3
+    ed = 0
+    if r == 0
+        r += 3
+        ed += 1
+    end
+    res = s[1:r]
+    for i in 1 : length(s) ÷ 3 - ed
+        res *= ""."" * s[r + i * 3 - 2 : r + i * 3]
+    end
+    res
+end"
+"930. Binary Subarrays With Sum
+ ---
+ 
+ In an array `A` of `0`s and `1`s, how many **non-empty** subarrays have sum
+ `S`?
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: A = [1,0,1,0,1], S = 2
+     Output: 4
+     Explanation:
+     The 4 subarrays are bolded below:
+     [ **1,0,1** ,0,1]
+     [ **1,0,1,0** ,1]
+     [1, **0,1,0,1** ]
+     [1,0, **1,0,1** ]
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `A.length <= 30000`
+   2. `0 <= S <= A.length`
+   3. `A[i]` is either `0` or `1`.","function num_subarrays_with_sum(nums::Vector{Int}, goal::Int) 
+    cnt = OffsetArray(fill(0, length(nums) + 1), -1)
+    s, res = 0, 0
+    for num in nums
+        cnt[s] += 1
+        s += num
+        res += get(cnt, s - goal, 0)
+    end
+    res
+end"
+"313. Super Ugly Number
+ ---
+ 
+ Write a program to find the `nth` super ugly number.
+ 
+ Super ugly numbers are positive numbers whose all prime factors are in the
+ given prime list `primes` of size `k`.
+ 
+ **Example:**
+ 
+     
+     
+     Input: n = 12, primes = [2,7,13,19]
+     Output: 32 
+     Explanation:[1,2,4,7,8,13,14,16,19,26,28,32] is the sequence of the first 12 
+                  super ugly numbers given primes = [2,7,13,19] of size 4.
+ 
+ **Note:**
+ 
+   * `1` is a super ugly number for any given `primes`.
+   * The given numbers in `primes` are in ascending order.
+   * 0 < `k` ≤ 100, 0 < `n` ≤ 106, 0 < `primes[i]` < 1000.
+   * The nth super ugly number is guaranteed to fit in a 32-bit signed integer.","function nth_super_ugly_number(n::Int, primes::Vector{Int})
+    dp = fill(1, n)
+    len = length(primes)
+    cur_min = primes[:]
+    ptrs = fill(1, len)
+    
+    @inbounds for i in 2:n
+        minn = minimum(cur_min)
+        dp[i] = minn
+        @simd for pidx in 1:len
+            if minn == cur_min[pidx]
+                ptrs[pidx] += 1
+                cur_min[pidx] = dp[ptrs[pidx]] * primes[pidx]
+            end
+        end
+    end
+    return dp[end]
+end"
+"350. Intersection of Two Arrays II
+ ---
+ 
+ Given two arrays, write a function to compute their intersection.
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums1 = [1,2,2,1], nums2 = [2,2]
+     Output: [2,2]
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums1 = [4,9,5], nums2 = [9,4,9,8,4]
+     Output: [4,9]
+ 
+ **Note:**
+ 
+   * Each element in the result should appear as many times as it shows in both arrays.
+   * The result can be in any order.
+ 
+ **Follow up:**
+ 
+   * What if the given array is already sorted? How would you optimize your algorithm?
+   * What if _nums1_ 's size is small compared to _nums2_ 's size? Which algorithm is better?
+   * What if elements of _nums2_ are stored on disk, and the memory is limited such that you cannot load all elements into the memory at once?","function intersection_of_arrays(nums1::Vector{Int}, nums2::Vector{Int})::Vector{Int}
+    nums1, nums2 = sort(nums1), sort(nums2)
+    n1, n2 = length(nums1), length(nums2)
+    i1, i2, res = 1, 1, Int[]
+    while i1 <= n1 && i2 <= n2
+        if nums1[i1] > nums2[i2]
+            i2 += 1
+        elseif nums1[i1] < nums2[i2]
+            i1 += 1
+        else
+            push!(res, nums1[i1])
+            i1 += 1
+            i2 += 1
+        end
+    end
+    return res
+end"
+"160. Intersection of Two Linked Lists
+ ---
+ 
+ Write a program to find the node at which the intersection of two singly
+ linked lists begins.
+ 
+ For example, the following two linked lists:
+ 
+ [![](https://assets.leetcode.com/uploads/2018/12/13/160_statement.png)](https://assets.leetcode.com/uploads/2018/12/13/160_statement.png)
+ 
+ begin to intersect at node c1.
+ 
+ 
+ 
+ **Example 1:**
+ 
+ [![](https://assets.leetcode.com/uploads/2020/06/29/160_example_1_1.png)](https://assets.leetcode.com/uploads/2020/06/29/160_example_1_1.png)
+ 
+     
+     
+     Input: intersectVal = 8, listA = [4,1,8,4,5], listB = [5,6,1,8,4,5], skipA = 2, skipB = 3
+     Output: Reference of the node with value = 8
+     **Input Explanation:** The intersected node's value is 8 (note that this must not be 0 if the two lists intersect). From the head of A, it reads as [4,1,8,4,5]. From the head of B, it reads as [5,6,1,8,4,5]. There are 2 nodes before the intersected node in A; There are 3 nodes before the intersected node in B.
+ 
+ 
+ 
+ **Example 2:**
+ 
+ [![](https://assets.leetcode.com/uploads/2020/06/29/160_example_2.png)](https://assets.leetcode.com/uploads/2020/06/29/160_example_2.png)
+ 
+     
+     
+     Input: intersectVal = 2, listA = [1,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
+     Output: Reference of the node with value = 2
+     **Input Explanation:**  The intersected node's value is 2 (note that this must not be 0 if the two lists intersect). From the head of A, it reads as [1,9,1,2,4]. From the head of B, it reads as [3,2,4]. There are 3 nodes before the intersected node in A; There are 1 node before the intersected node in B.
+     
+ 
+ 
+ 
+ **Example 3:**
+ 
+ [![](https://assets.leetcode.com/uploads/2018/12/13/160_example_3.png)](https://assets.leetcode.com/uploads/2018/12/13/160_example_3.png)
+ 
+     
+     
+     Input: intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
+     Output: null
+     **Input Explanation:** From the head of A, it reads as [2,6,4]. From the head of B, it reads as [1,5]. Since the two lists do not intersect, intersectVal must be 0, while skipA and skipB can be arbitrary values.
+     Explanation: The two lists do not intersect, so return null.
+     
+ 
+ 
+ 
+ **Notes:**
+ 
+   * If the two linked lists have no intersection at all, return `null`.
+   * The linked lists must retain their original structure after the function returns.
+   * You may assume there are no cycles anywhere in the entire linked structure.
+   * Each value on each linked list is in the range `[1, 10^9]`.
+   * Your code should preferably run in O(n) time and use only O(1) memory.","function get_intersection_node(head_a::ListNode, head_b::ListNode)::Union{ListNode,Nothing}
+    isnothing(head_a) || isnothing(head_b) && return nothing
+    pa, pb = head_a, head_b
+
+    while pa != pb
+        pa = isnothing(pa) ? head_b : pa.next
+        pb = isnothing(pb) ? head_a : pb.next
+    end
+
+    return pa
+end"
+"1054. Distant Barcodes
+ ---
+ 
+ In a warehouse, there is a row of barcodes, where the `ith` barcode is
+ `barcodes[i]`.
+ 
+ Rearrange the barcodes so that no two adjacent barcodes are equal. You may
+ return any answer, and it is guaranteed an answer exists.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: barcodes = [1,1,1,2,2,2]
+     Output: [2,1,2,1,2,1]
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: barcodes = [1,1,1,1,2,2,3,3]
+     Output: [1,3,1,3,1,2,1,2]
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= barcodes.length <= 10000`
+   * `1 <= barcodes[i] <= 10000`","function rearrange_barcodes(barcodes::Vector{Int})
+    len = length(barcodes)
+    res = zeros(Int, len)
+    cnt = counter(barcodes)
+    hp = heapify!([(v, k) for (k, v) in cnt])
+    idx = 1
+    while !isempty(hp)
+        v, k = heappop!(hp)
+        for _ in 1:v
+            res[idx] = k
+            idx += 2
+            idx > len && (idx = 2)
+        end
+    end
+    return res
+end"
+"661. Image Smoother
+ ---
+ 
+ Given a 2D integer matrix M representing the gray scale of an image, you need
+ to design a smoother to make the gray scale of each cell becomes the average
+ gray scale (rounding down) of all the 8 surrounding cells and itself. If a
+ cell has less than 8 surrounding cells, then use as many as you can.
+ 
+ **Example 1:**  
+ 
+     
+     
+     Input:
+     [[1,1,1],
+      [1,0,1],
+      [1,1,1]]
+     Output:
+     [[0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0]]
+     Explanation:
+     For the point (0,0), (0,2), (2,0), (2,2): floor(3/4) = floor(0.75) = 0
+     For the point (0,1), (1,0), (1,2), (2,1): floor(5/6) = floor(0.83333333) = 0
+     For the point (1,1): floor(8/9) = floor(0.88888889) = 0
+     
+ 
+ **Note:**  
+ 
+   1. The value in the given matrix is in the range of [0, 255].
+   2. The length and width of the given matrix are in the range of [1, 150].","function image_smoother(img::Matrix{Int})::Matrix{Int}
+    presum, (m, n) = similar(img), size(img)
+    presum[1, 1] = img[1, 1]
+    for i in 2:m
+        presum[i, 1] = presum[i - 1, 1] + img[i, 1]
+    end
+    for j in 2:n
+        presum[1, j] = presum[1, j - 1] + img[1, j]
+    end
+    for i in 2:m, j in 2:n
+        presum[i, j] =
+            img[i, j] + presum[i - 1, j] + presum[i, j - 1] - presum[i - 1, j - 1]
+    end
+    ## obtain results from 2-dim presum
+    res, indices = similar(img), CartesianIndices(img)
+    for i in 1:m, j in 1:n
+        x1 = i > 1 ? i - 2 : i - 1
+        y1 = j > 1 ? j - 2 : j - 1
+        x2 = i < m ? i + 1 : i
+        y2 = j < n ? j + 1 : j
+        idx1, idx2, idx3, idx4 = CartesianIndex.([(x1, y1), (x1, y2), (x2, y1), (x2, y2)])
+        area =
+            presum[idx4] - (idx2 ∈ indices && presum[idx2]) -
+            (idx3 ∈ indices && presum[idx3]) + (idx1 ∈ indices && presum[idx1])
+        res[i, j] = area ÷ prod((idx4 - idx1).I)
+    end
+    return res
+end"
+"32. Longest Valid Parentheses
+ ---
+ 
+ Given a string containing just the characters `'('` and `')'`, find the length
+ of the longest valid (well-formed) parentheses substring.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: s = ""(()""
+     Output: 2
+     Explanation: The longest valid parentheses substring is ""()"".
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: s = "")()())""
+     Output: 4
+     Explanation: The longest valid parentheses substring is ""()()"".
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: s = """"
+     Output: 0
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `0 <= s.length <= 3 * 104`
+   * `s[i]` is `'('`, or `')'`.","function longest_valid_parentheses(s::String)::Int
+    dp = zeros(Int, length(s))
+    n = 0
+    for i in 2:length(s)
+        if s[i] == ')'
+            if s[i - 1] == '('
+                ## case 1: ()()
+                dp[i] = i == 2 ? 2 : dp[i - 2] + 2
+            else
+                ## case 2: (())
+                i₍ = i - dp[i - 1] - 1
+                if i₍ >= 1 && s[i₍] == '('
+                    if dp[i - 1] > 0
+                        dp[i] = dp[i - 1] + 2 + (i₍ == 1 ? 0 : dp[i₍ - 1])
+                    end
+                end
+            end
+            n = max(n, dp[i])
+        end
+    end
+    return n
+end"
+"226. Invert Binary Tree
+ ---
+ 
+ Invert a binary tree.
+ 
+ **Example:**
+ 
+ Input:
+ 
+     
+     
+          4
+        /   \
+       2     7
+      / \   / \
+     1   3 6   9
+ 
+ Output:
+ 
+     
+     
+          4
+        /   \
+       7     2
+      / \   / \
+     9   6 3   1
+ 
+ **Trivia:**  
+ This problem was inspired by [this original
+ tweet](https://twitter.com/mxcl/status/608682016205344768) by [Max
+ Howell](https://twitter.com/mxcl):
+ 
+ > Google: 90% of our engineers use the software you wrote (Homebrew), but you
+ > can't invert a binary tree on a whiteboard so f*** off.","function invert_tree!(root::Union{TreeNode{Int},Nothing})::Union{TreeNode,Nothing}
+    isnothing(root) && return nothing
+    queue = [root]
+    while !isempty(queue)
+        node = popfirst!(queue)
+        if !isnothing(node.left)
+            push!(queue, node.left)
+        end
+        if !isnothing(node.right)
+            push!(queue, node.right)
+        end
+        node.left, node.right = node.right, node.left
+    end
+    return root
+end"
+"1403. Minimum Subsequence in Non-Increasing Order
+ ---
+ 
+ Given the array `nums`, obtain a subsequence of the array whose sum of
+ elements is **strictly greater** than the sum of the non included elements in
+ such subsequence.
+ 
+ If there are multiple solutions, return the subsequence with **minimum size**
+ and if there still exist multiple solutions, return the subsequence with the
+ **maximum total sum** of all its elements. A subsequence of an array can be
+ obtained by erasing some (possibly zero) elements from the array.
+ 
+ Note that the solution with the given constraints is guaranteed to be
+ **unique**. Also return the answer sorted in **non-increasing** order.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums = [4,3,10,9,8]
+     Output: [10,9] 
+     Explanation: The subsequences [10,9] and [10,8] are minimal such that the sum of their elements is strictly greater than the sum of elements not included, however, the subsequence [10,9] has the maximum total sum of its elements. 
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums = [4,4,7,6,7]
+     Output: [7,7,6] 
+     Explanation: The subsequence [7,7] has the sum of its elements equal to 14 which is not strictly greater than the sum of elements not included (14 = 4 + 4 + 6). Therefore, the subsequence [7,6,7] is the minimal satisfying the conditions. Note the subsequence has to returned in non-decreasing order.  
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: nums = [6]
+     Output: [6]
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= nums.length <= 500`
+   * `1 <= nums[i] <= 100`","function min_subsequence(nums::Vector{Int})
+    sort!(nums; rev=true)
+    half = sum(nums) >> 1
+    res, total = Int[], 0
+    for num in nums
+        total += num
+        push!(res, num)
+        total > half && return res
+    end
+end"
+"778. Swim in Rising Water
+ ---
+ 
+ On an N x N `grid`, each square `grid[i][j]` represents the elevation at that
+ point `(i,j)`.
+ 
+ Now rain starts to fall. At time `t`, the depth of the water everywhere is
+ `t`. You can swim from a square to another 4-directionally adjacent square if
+ and only if the elevation of both squares individually are at most `t`. You
+ can swim infinite distance in zero time. Of course, you must stay within the
+ boundaries of the grid during your swim.
+ 
+ You start at the top left square `(0, 0)`. What is the least time until you
+ can reach the bottom right square `(N-1, N-1)`?
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: [[0,2],[1,3]]
+     Output: 3
+     Explanation:
+     At time 0, you are in grid location (0, 0).
+     You cannot go anywhere else because 4-directionally adjacent neighbors have a higher elevation than t = 0.
+     
+     You cannot reach point (1, 1) until time 3.
+     When the depth of water is 3, we can swim anywhere inside the grid.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: [[0,1,2,3,4],[24,23,22,21,5],[12,13,14,15,16],[11,17,18,19,20],[10,9,8,7,6]]
+     Output: 16
+     Explanation:
+     **0  1  2  3  4**
+     24 23 22 21  **5**
+     **12 13 14 15 16**
+     **11** 17 18 19 20
+     **10  9  8  7  6**
+     
+     The final route is marked in bold.
+     We need to wait until time 16 so that (0, 0) and (4, 4) are connected.
+     
+ 
+ **Note:**
+ 
+   1. `2 <= N <= 50`.
+   2. grid[i][j] is a permutation of [0, ..., N*N - 1].","function swim_in_water(grid::Vector{Vector{Int}})
+    function neighbors(pos, len)    
+        res = Tuple{Int, Int}[]
+        (pos[1] > 1) && (push!(res, (pos[1] - 1, pos[2])))
+        (pos[1] < len) && (push!(res, (pos[1] + 1, pos[2])))
+        (pos[2] > 1) && (push!(res, (pos[1], pos[2] - 1)))
+        (pos[2] < len) && (push!(res, (pos[1], pos[2] + 1)))
+        res
+    end
+    len = length(grid)
+    visited = fill(false, len, len)
+    pq = PriorityQueue{Tuple{Int, Int}, Int}()
+    pq[(1, 1)] = grid[1][1]
+    while !isempty(pq)
+        pos, cost = dequeue_pair!(pq)
+        visited[pos[1], pos[2]] = true
+        if pos == (len, len)
+            return cost
+        end
+        for neighbor in neighbors(pos, len)
+            if !visited[neighbor[1], neighbor[2]]
+                pq[neighbor] = min(max(grid[neighbor[1]][neighbor[2]], cost), get(pq, neighbor, typemax(Int)))
+            end
+        end
+    end
+    ## return 0
+end"
+"894. All Possible Full Binary Trees
+ ---
+ 
+ A _full binary tree_  is a binary tree where each node has exactly 0 or 2
+ children.
+ 
+ Return a list of all possible full binary trees with `N` nodes.  Each element
+ of the answer is the root node of one possible tree.
+ 
+ Each `node` of each tree in the answer **must** have `node.val = 0`.
+ 
+ You may return the final list of trees in any order.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: 7
+     Output: [[0,0,0,null,null,0,0,null,null,0,0],[0,0,0,null,null,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,null,null,null,null,0,0],[0,0,0,0,0,null,null,0,0]]
+     Explanation:
+     ![](https://s3-lc-upload.s3.amazonaws.com/uploads/2018/08/22/fivetrees.png)
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   * `1 <= N <= 20`","function all_possible_fbt(N::Int)
+    cache_res = [TreeNode{Int}[] for i in 1:N]
+    cache_res[1] = [TreeNode(0)]
+    if N % 2 == 0
+        return TreeNode{Int}[]
+    end
+    for n in 3:2:N
+        for i in 1:2:n-1
+            lres = cache_res[i]
+            rres = cache_res[n-i-1]
+            append!(cache_res[n], TreeNode(0, lr, rr) for lr in lres for rr in rres)
+        end
+    end
+    return cache_res[N]
+end"
+"189. Rotate Array
+ ---
+ 
+ Given an array, rotate the array to the right by _k_ steps, where  _k_  is
+ non-negative.
+ 
+ **Follow up:**
+ 
+   * Try to come up as many solutions as you can, there are at least 3 different ways to solve this problem.
+   * Could you do it in-place with O(1) extra space?
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums = [1,2,3,4,5,6,7], k = 3
+     Output: [5,6,7,1,2,3,4]
+     Explanation:
+     rotate 1 steps to the right: [7,1,2,3,4,5,6]
+     rotate 2 steps to the right: [6,7,1,2,3,4,5]
+     rotate 3 steps to the right: [5,6,7,1,2,3,4]
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums = [-1,-100,3,99], k = 2
+     Output: [3,99,-1,-100]
+     Explanation: 
+     rotate 1 steps to the right: [99,-1,-100,3]
+     rotate 2 steps to the right: [3,99,-1,-100]
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= nums.length <= 2 * 104`
+   * `-231 <= nums[i] <= 231 - 1`
+   * `0 <= k <= 105`","function rotate_arr(nums::Vector{Int}, k::Int)
+    k %= length(nums)
+    reverse!(nums) 
+    reverse!(@view nums[1:k])
+    reverse!(@view nums[k+1:end])
+    nums
+end"
+"1567. Maximum Length of Subarray With Positive Product
+ ---
+ 
+ Given an array of integers `nums`, find the maximum length of a subarray where
+ the product of all its elements is positive.
+ 
+ A subarray of an array is a consecutive sequence of zero or more values taken
+ out of that array.
+ 
+ Return  _the maximum length of a subarray with positive product_.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums = [1,-2,-3,4]
+     Output: 4
+     Explanation: The array nums already has a positive product of 24.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums = [0,1,-2,-3,-4]
+     Output: 3
+     Explanation: The longest subarray with positive product is [1,-2,-3] which has a product of 6.
+     Notice that we cannot include 0 in the subarray since that'll make the product 0 which is not positive.
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: nums = [-1,-2,-3,0,1]
+     Output: 2
+     Explanation: The longest subarray with positive product is [-1,-2] or [-2,-3].
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: nums = [-1,2]
+     Output: 1
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: nums = [1,2,3,5,-6,4,0,10]
+     Output: 4
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= nums.length <= 10^5`
+   * `-10^9 <= nums[i] <= 10^9`","function get_max_len(nums::Vector{Int})::Int
+    pos_pre = neg_pre = max_ans = 0
+    for num in nums
+        if num == 0
+            pos_pre = neg_pre = 0
+        elseif num > 0
+            pos_pre = pos_pre + 1
+            neg_pre = neg_pre != 0 ? neg_pre + 1 : 0
+        else
+            neg_tmp = neg_pre
+            neg_pre = pos_pre != 0 ? pos_pre + 1 : 1
+            pos_pre = neg_tmp != 0 ? neg_tmp + 1 : 0
+        end
+        max_ans = max(max_ans, pos_pre)
+    end
+    return max_ans
+end"
+"1432. Max Difference You Can Get From Changing an Integer
+ ---
+ 
+ You are given an integer `num`. You will apply the following steps exactly
+ **two** times:
+ 
+   * Pick a digit `x (0 <= x <= 9)`.
+   * Pick another digit `y (0 <= y <= 9)`. The digit `y` can be equal to `x`.
+   * Replace all the occurrences of `x` in the decimal representation of `num` by `y`.
+   * The new integer **cannot** have any leading zeros, also the new integer **cannot** be 0.
+ 
+ Let `a` and `b` be the results of applying the operations to `num` the first
+ and second times, respectively.
+ 
+ Return _the max difference_ between `a` and `b`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: num = 555
+     Output: 888
+     Explanation: The first time pick x = 5 and y = 9 and store the new integer in a.
+     The second time pick x = 5 and y = 1 and store the new integer in b.
+     We have now a = 999 and b = 111 and max difference = 888
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: num = 9
+     Output: 8
+     Explanation: The first time pick x = 9 and y = 9 and store the new integer in a.
+     The second time pick x = 9 and y = 1 and store the new integer in b.
+     We have now a = 9 and b = 1 and max difference = 8
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: num = 123456
+     Output: 820000
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: num = 10000
+     Output: 80000
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: num = 9288
+     Output: 8700
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= num <= 10^8`","function max_score_1432(card_points::Vector{Int}, k::Int)
+    len, tt = length(card_points), sum(card_points)
+    i, j = 1, len - k
+    minn = sum(card_points[i:j])
+    tmp = minn
+    while j < len
+        tmp -= card_points[i]
+        i += 1
+        tmp += card_points[j += 1]
+        minn = min(tmp, minn)
+    end
+    tt - minn
+end"
+"565. Array Nesting
+ ---
+ 
+ A zero-indexed array A of length N contains all integers from 0 to N-1. Find
+ and return the longest length of set S, where S[i] = {A[i], A[A[i]],
+ A[A[A[i]]], ... } subjected to the rule below.
+ 
+ Suppose the first element in S starts with the selection of element A[i] of
+ index = i, the next element in S should be A[A[i]], and then A[A[A[i]]]… By
+ that analogy, we stop adding right before a duplicate element occurs in S.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: A = [5,4,0,3,1,6,2]
+     Output: 4
+     Explanation: 
+     A[0] = 5, A[1] = 4, A[2] = 0, A[3] = 3, A[4] = 1, A[5] = 6, A[6] = 2.
+     
+     One of the longest S[K]:
+     S[0] = {A[0], A[5], A[6], A[2]} = {5, 6, 2, 0}
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. N is an integer within the range [1, 20,000].
+   2. The elements of A are all distinct.
+   3. Each element of A is an integer within the range [0, N-1].","function array_nesting(nums::Vector{Int})
+    visited = fill(false, length(nums))
+    res = 0
+    for (idx, num) in enumerate(nums)
+        num += 1
+        visited[idx] && continue
+        tmp = 1
+        visited[idx] = true
+        while !visited[num]
+            visited[num] = true
+            num = nums[num] + 1
+            tmp += 1
+        end
+        res = max(res, tmp)
+    end
+    return res
+end"
+"373. Find K Pairs with Smallest Sums
+ ---
+ 
+ You are given two integer arrays **nums1** and **nums2** sorted in ascending
+ order and an integer **k**.
+ 
+ Define a pair **(u,v)** which consists of one element from the first array and
+ one element from the second array.
+ 
+ Find the k pairs **(u 1,v1),(u2,v2) ...(uk,vk)** with the smallest sums.
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums1 = [1,7,11], nums2 = [2,4,6], k = 3
+     Output: [[1,2],[1,4],[1,6]] 
+     Explanation: The first 3 pairs are returned from the sequence: 
+                  [1,2],[1,4],[1,6],[7,2],[7,4],[11,2],[7,6],[11,4],[11,6]
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums1 = [1,1,2], nums2 = [1,2,3], k = 2
+     Output: [1,1],[1,1]
+     Explanation: The first 2 pairs are returned from the sequence: 
+                  [1,1],[1,1],[1,2],[2,1],[1,2],[2,2],[1,3],[1,3],[2,3]
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: nums1 = [1,2], nums2 = [3], k = 3
+     Output: [1,3],[2,3]
+     Explanation: All possible pairs are returned from the sequence: [1,3],[2,3]","using DataStructures
+function k_smallest_pairs(nums1::Vector{Int}, nums2::Vector{Int}, k::Int)
+    hp = Tuple{Int, Int}[]
+    odr = Base.Order.By(x -> -x[1] - x[2])
+    for n1 in nums1, n2 in nums2
+        heappush!(hp, (n1, n2), odr)
+        length(hp) > k && heappop!(hp, odr)
+    end
+    sort!(hp; by = x -> x[1] + x[2])
+end"
+"382. Linked List Random Node
+ ---
+ 
+ Given a singly linked list, return a random node's value from the linked list.
+ Each node must have the **same probability** of being chosen.
+ 
+ **Follow up:**  
+ What if the linked list is extremely large and its length is unknown to you?
+ Could you solve this efficiently without using extra space?
+ 
+ **Example:**
+ 
+     
+     
+     // Init a singly linked list [1,2,3].
+     ListNode head = new ListNode(1);
+     head.next = new ListNode(2);
+     head.next.next = new ListNode(3);
+     Solution solution = new Solution(head);
+     
+     // getRandom() should return either 1, 2, or 3 randomly. Each element should have equal probability of returning.
+     solution.getRandom();","function get_random(head::ListNode)::Int
+    node, i, res = head, 1, 0
+    while !isnothing(node)
+        if rand(1:i) == 1  ## 1/i prob for value change
+            res = node.val
+        end
+        node = node.next
+        i += 1
+    end
+    return res
+end"
+"482. License Key Formatting
+ ---
+ 
+ You are given a license key represented as a string S which consists only
+ alphanumeric character and dashes. The string is separated into N+1 groups by
+ N dashes.
+ 
+ Given a number K, we would want to reformat the strings such that each group
+ contains _exactly_ K characters, except for the first group which could be
+ shorter than K, but still must contain at least one character. Furthermore,
+ there must be a dash inserted between two groups and all lowercase letters
+ should be converted to uppercase.
+ 
+ Given a non-empty string S and a number K, format the string according to the
+ rules described above.
+ 
+ **Example 1:**  
+ 
+     
+     
+     Input: S = ""5F3Z-2e-9-w"", K = 4
+     
+     Output: ""5F3Z-2E9W""
+     
+     Explanation: The string S has been split into two parts, each part has 4 characters.
+     Note that the two extra dashes are not needed and can be removed.
+     
+ 
+ **Example 2:**  
+ 
+     
+     
+     Input: S = ""2-5g-3-J"", K = 2
+     
+     Output: ""2-5G-3J""
+     
+     Explanation: The string S has been split into three parts, each part has 2 characters except the first part as it could be shorter as mentioned above.
+     
+ 
+ **Note:**  
+ 
+   1. The length of string S will not exceed 12,000, and K is a positive integer.
+   2. String S consists only of alphanumerical characters (a-z and/or A-Z and/or 0-9) and dashes(-).
+   3. String S is non-empty.","function license_key_formatting(S::String, K::Int)
+    res = """"
+    cnt = 0
+    for i in length(S):-1:1
+        if cnt == K
+            res *= '-'
+            cnt = 0
+        end
+        if S[i] != '-'
+            res *= uppercase(S[i])
+            cnt += 1
+        end
+    end
+    reverse(res)
+end"
+"701. Insert into a Binary Search Tree
+ ---
+ 
+ You are given the `root` node of a binary search tree (BST) and a `value` to
+ insert into the tree. Return _the root node of the BST after the insertion_.
+ It is **guaranteed** that the new value does not exist in the original BST.
+ 
+ **Notice**  that there may exist multiple valid ways for the insertion, as
+ long as the tree remains a BST after insertion. You can return **any of
+ them**.
+ 
+ 
+ 
+ **Example 1:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/10/05/insertbst.jpg)
+ 
+     
+     
+     Input: root = [4,2,7,1,3], val = 5
+     Output: [4,2,7,1,3,5]
+     Explanation: Another accepted tree is:
+     ![](https://assets.leetcode.com/uploads/2020/10/05/bst.jpg)
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: root = [40,20,60,10,30,50,70], val = 25
+     Output: [40,20,60,10,30,50,70,null,null,25]
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: root = [4,2,7,1,3,null,null,null,null,null,null], val = 5
+     Output: [4,2,7,1,3,5]
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * The number of nodes in the tree will be in the range `[0, 104]`.
+   * `-108 <= Node.val <= 108`
+   * All the values `Node.val` are **unique**.
+   * `-108 <= val <= 108`
+   * It's **guaranteed** that `val` does not exist in the original BST.","insert_into_bst(::Nothing, val::Int) = TreeNode(val)
+function insert_into_bst(root::TreeNode, val::Int)::TreeNode
+    if root.val > val
+        root.left = insert_into_bst(root.left, val)
+    else
+        root.right = insert_into_bst(root.right, val)
+    end
+    return root
+end"
+"69. Sqrt(x)
+ ---
+ 
+ Given a non-negative integer `x`, compute and return _the square root of_ `x`.
+ 
+ Since the return type is an integer, the decimal digits are **truncated** ,
+ and only **the integer part** of the result is returned.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: x = 4
+     Output: 2
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: x = 8
+     Output: 2
+     Explanation: The square root of 8 is 2.82842..., and since the decimal part is truncated, 2 is returned.
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `0 <= x <= 231 - 1`","my_sqrt = isqrt
+function mysqrt(x::Int)::Int
+    x < 0 && throw(DomainError(x))
+    left, right = 0, x
+    while left <= right
+        mid = left + ((right - left) >> 1)
+        if mid^2 > x
+            right = mid - 1
+        else
+            left = mid + 1
+        end
+    end
+    return right
+end"
+"507. Perfect Number
+ ---
+ 
+ A [**perfect number**](https://en.wikipedia.org/wiki/Perfect_number) is a
+ **positive integer** that is equal to the sum of its **positive divisors** ,
+ excluding the number itself. A **divisor** of an integer `x` is an integer
+ that can divide `x` evenly.
+ 
+ Given an integer `n`, return `true` _if_`n` _is a perfect number, otherwise
+ return_`false`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: num = 28
+     Output: true
+     Explanation: 28 = 1 + 2 + 4 + 7 + 14
+     1, 2, 4, 7, and 14 are all divisors of 28.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: num = 6
+     Output: true
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: num = 496
+     Output: true
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: num = 8128
+     Output: true
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: num = 2
+     Output: false
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= num <= 108`","perfect_number(num::Int) = num in [6, 28, 496, 8128, 33550336]"
+"316. Remove Duplicate Letters
+ ---
+ 
+ Given a string `s`, remove duplicate letters so that every letter appears once
+ and only once. You must make sure your result is **the smallest in
+ lexicographical order** among all possible results.
+ 
+ **Note:** This question is the same as 1081:
+ <https://leetcode.comhttps://leetcode.com/problems/smallest-subsequence-of-distinct-characters/>
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: s = ""bcabc""
+     Output: ""abc""
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: s = ""cbacdcbc""
+     Output: ""acdb""
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= s.length <= 104`
+   * `s` consists of lowercase English letters.","function remove_duplicate_letters(s::String)::String
+    stk = Char[]
+    added = Set{Char}()
+    remain = fill(0, 26)
+    for ch in s
+        remain[ch - 'a' + 1] += 1 
+    end
+    for ch in s
+        if !(ch in added)
+            while !isempty(stk) && stk[end] > ch && remain[stk[end] - 'a' + 1] > 0
+                pop!(added, pop!(stk))
+            end
+            push!(added, ch)
+            push!(stk, ch)
+        end
+        remain[ch - 'a' + 1] -= 1
+    end
+    return join(stk)
+end"
+"413. Arithmetic Slices
+ ---
+ 
+ A sequence of numbers is called arithmetic if it consists of at least three
+ elements and if the difference between any two consecutive elements is the
+ same.
+ 
+ For example, these are arithmetic sequences:
+ 
+     
+     
+     1, 3, 5, 7, 9
+     7, 7, 7, 7
+     3, -1, -5, -9
+ 
+ The following sequence is not arithmetic.
+ 
+     
+     
+     1, 1, 2, 5, 7
+ 
+ 
+ 
+ A zero-indexed array A consisting of N numbers is given. A slice of that array
+ is any pair of integers (P, Q) such that 0 <= P < Q < N.
+ 
+ A slice (P, Q) of the array A is called arithmetic if the sequence:  
+ A[P], A[P \+ 1], ..., A[Q - 1], A[Q] is arithmetic. In particular, this means
+ that P + 1 < Q.
+ 
+ The function should return the number of arithmetic slices in the array A.
+ 
+ 
+ 
+ **Example:**
+ 
+     
+     
+     A = [1, 2, 3, 4]
+     
+     return: 3, for 3 arithmetic slices in A: [1, 2, 3], [2, 3, 4] and [1, 2, 3, 4] itself.","function number_of_arithmetic_slices(nums::Vector{Int})
+    dp, res = 0, 0
+    for i in 3:length(nums)
+        if nums[i] + nums[i - 2] == (nums[i - 1] << 1)
+            res += (dp += 1)
+        else
+            dp = 0
+        end
+    end
+    return res
+end"
+"1094. Car Pooling
+ ---
+ 
+ You are driving a vehicle that has `capacity` empty seats initially available
+ for passengers.  The vehicle **only** drives east (ie. it **cannot** turn
+ around and drive west.)
+ 
+ Given a list of `trips`, `trip[i] = [num_passengers, start_location,
+ end_location]` contains information about the `i`-th trip: the number of
+ passengers that must be picked up, and the locations to pick them up and drop
+ them off.  The locations are given as the number of kilometers due east from
+ your vehicle's initial location.
+ 
+ Return `true` if and only if it is possible to pick up and drop off all
+ passengers for all the given trips.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: trips = [[2,1,5],[3,3,7]], capacity = 4
+     Output: false
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: trips = [[2,1,5],[3,3,7]], capacity = 5
+     Output: true
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: trips = [[2,1,5],[3,5,7]], capacity = 3
+     Output: true
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: trips = [[3,2,7],[3,7,9],[8,3,9]], capacity = 11
+     Output: true
+     
+ 
+ 
+ 
+ 
+ 
+ **Constraints:**
+ 
+   1. `trips.length <= 1000`
+   2. `trips[i].length == 3`
+   3. `1 <= trips[i][0] <= 100`
+   4. `0 <= trips[i][1] < trips[i][2] <= 1000`
+   5. `1 <= capacity <= 100000`","function car_pooling(trips::Vector{Vector{Int}}, cap::Int)::Bool
+    sort!(trips; by = x -> x[2])
+    hp = Tuple{Int, Int}[]
+    res = 0
+    for trip in trips
+        heappush!(hp, (trip[3], trip[1]))
+        res += trip[1]
+        hp[1][1] <= trip[2] && (res -= heappop!(hp)[1])
+        res > cap && return false
+    end
+    true
+end"
+"129. Sum Root to Leaf Numbers
+ ---
+ 
+ Given a binary tree containing digits from `0-9` only, each root-to-leaf path
+ could represent a number.
+ 
+ An example is the root-to-leaf path `1->2->3` which represents the number
+ `123`.
+ 
+ Find the total sum of all root-to-leaf numbers.
+ 
+ **Note:**  A leaf is a node with no children.
+ 
+ **Example:**
+ 
+     
+     
+     Input: [1,2,3]
+         1
+        / \
+       2   3
+     Output: 25
+     Explanation:
+     The root-to-leaf path 1->2 represents the number 12.
+     The root-to-leaf path 1->3 represents the number 13.
+     Therefore, sum = 12 + 13 = 25.
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: [4,9,0,5,1]
+         4
+        / \
+       9   0
+      / \
+     5   1
+     Output: 1026
+     Explanation:
+     The root-to-leaf path 4->9->5 represents the number 495.
+     The root-to-leaf path 4->9->1 represents the number 491.
+     The root-to-leaf path 4->0 represents the number 40.
+     Therefore, sum = 495 + 491 + 40 = 1026.","using DataStructures
+
+function sum_numbers(root::TreeNode)::Int
+    queue, res = Deque{TreeNode}(), 0
+
+    !isnothing(root) && push!(queue, root)
+
+    while !isempty(queue)
+        node = popfirst!(queue)
+        if isnothing(node.left) && isnothing(node.right)
+            res += node.val
+        end
+        if !isnothing(node.left)
+            node.left.val += node.val * 10
+            push!(queue, node.left)
+        end
+        if !isnothing(node.right)
+            node.right.val += node.val * 10
+            push!(queue, node.right)
+        end
+    end
+
+    return res
+end"
+"592. Fraction Addition and Subtraction
+ ---
+ 
+ Given a string representing an expression of fraction addition and
+ subtraction, you need to return the calculation result in string format. The
+ final result should be [irreducible
+ fraction](https://en.wikipedia.org/wiki/Irreducible_fraction). If your final
+ result is an integer, say `2`, you need to change it to the format of fraction
+ that has denominator `1`. So in this case, `2` should be converted to `2/1`.
+ 
+ **Example 1:**  
+ 
+     
+     
+     Input: ""-1/2+1/2""
+     Output: ""0/1""
+     
+ 
+ **Example 2:**  
+ 
+     
+     
+     Input: ""-1/2+1/2+1/3""
+     Output: ""1/3""
+     
+ 
+ **Example 3:**  
+ 
+     
+     
+     Input: ""1/3-1/2""
+     Output: ""-1/6""
+     
+ 
+ **Example 4:**  
+ 
+     
+     
+     Input: ""5/3+1/3""
+     Output: ""2/1""
+     
+ 
+ **Note:**  
+ 
+   1. The input string only contains `'0'` to `'9'`, `'/'`, `'+'` and `'-'`. So does the output.
+   2. Each fraction (input and output) has format `±numerator/denominator`. If the first input fraction or the output is positive, then `'+'` will be omitted.
+   3. The input only contains valid **irreducible fractions** , where the **numerator** and **denominator** of each fraction will always be in the range [1,10]. If the denominator is 1, it means this fraction is actually an integer in a fraction format defined above.
+   4. The number of given fractions will be in the range [1,10].
+   5. The numerator and denominator of the **final result** are guaranteed to be valid and in the range of 32-bit int.","function fraction_addition(expression::String)
+    expression = replace(expression, ""/"" => ""//"")
+    res = eval(Meta.parse(expression))
+    return ""$(res.num)/$(res.den)""
+end"
+"481. Magical String
+ ---
+ 
+ A magical string **S** consists of only '1' and '2' and obeys the following
+ rules:
+ 
+ The string **S** is magical because concatenating the number of contiguous
+ occurrences of characters '1' and '2' generates the string **S** itself.
+ 
+ The first few elements of string **S** is the following: **S** =
+ ""1221121221221121122……""
+ 
+ If we group the consecutive '1's and '2's in **S** , it will be:
+ 
+ 1 22 11 2 1 22 1 22 11 2 11 22 ......
+ 
+ and the occurrences of '1's or '2's in each group are:
+ 
+ 1 2 2 1 1 2 1 2 2 1 2 2 ......
+ 
+ You can see that the occurrence sequence above is the **S** itself.
+ 
+ Given an integer N as input, return the number of '1's in the first N number
+ in the magical string **S**.
+ 
+ **Note:** N will not exceed 100,000.
+ 
+ **Example 1:**  
+ 
+     
+     
+     Input: 6
+     Output: 3
+     Explanation: The first 6 elements of magical string S is ""12211"" and it contains three 1's, so return 3.","function magical_string(n::Int)
+    res = ""122""
+    idx = 2
+    while length(res) < n
+        res *= '1'^(res[idx+=1] - '0')
+        res *= '2'^(res[idx += 1] - '0')
+    end
+    return count(==('1'), SubString(res, 1, n))
+end"
+"719. Find K-th Smallest Pair Distance
+ ---
+ 
+ Given an integer array, return the k-th smallest **distance** among all the
+ pairs. The distance of a pair (A, B) is defined as the absolute difference
+ between A and B.
+ 
+ **Example 1:**  
+ 
+     
+     
+     Input:
+     nums = [1,3,1]
+     k = 1
+     **Output: 0** 
+     Explanation:
+     Here are all the pairs:
+     (1,3) -> 2
+     (1,1) -> 0
+     (3,1) -> 2
+     Then the 1st smallest distance pair is (1,1), and its distance is 0.
+     
+ 
+ **Note:**  
+ 
+   1. `2 <= len(nums) <= 10000`.
+   2. `0 <= nums[i] < 1000000`.
+   3. `1 <= k <= len(nums) * (len(nums) - 1) / 2`.","function smallest_distance_pair(nums::Vector{Int}, k::Int)::Int
+    sort!(nums)
+    n = length(nums)
+    function count_not_greater(diff)
+        i, ans = 1, 0
+        for j in 2: n
+            while nums[j] - nums[i] > diff
+                i += 1
+            ans += j - i
+            end
+        end
+
+        return ans
+    end
+
+    left, right = 0, nums[end] - nums[1]
+    while left <= right
+        mid = (left + right) >> 1
+        if count_not_greater(mid) >= k
+            right = mid - 1
+        else
+            left = mid + 1
+        end
+    end
+
+    return left
+end"
+"1317. Convert Integer to the Sum of Two No-Zero Integers
+ ---
+ 
+ Given an integer `n`. No-Zero integer is a positive integer which **doesn 't
+ contain any 0** in its decimal representation.
+ 
+ Return _a list of two integers_ `[A, B]` where:
+ 
+   * `A` and `B` are No-Zero integers.
+   * `A + B = n`
+ 
+ It's guarateed that there is at least one valid solution. If there are many
+ valid solutions you can return any of them.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: n = 2
+     Output: [1,1]
+     Explanation: A = 1, B = 1. A + B = n and both A and B don't contain any 0 in their decimal representation.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: n = 11
+     Output: [2,9]
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: n = 10000
+     Output: [1,9999]
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: n = 69
+     Output: [1,68]
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: n = 1010
+     Output: [11,999]
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `2 <= n <= 10^4`","function get_no_zero_integers(n::Int)::Vector{Int}
+    for i in 1:(n - 1)
+        if !('0' in string(i)) && !('0' in string(n - i))
+            return [i, n - i]
+        end
+    end
+end"
+"1577. Number of Ways Where Square of Number Is Equal to Product of Two Numbers
+ ---
+ 
+ Given two arrays of integers `nums1` and `nums2`, return the number of
+ triplets formed (type 1 and type 2) under the following rules:
+ 
+   * Type 1: Triplet (i, j, k) if `nums1[i]2 == nums2[j] * nums2[k]` where `0 <= i < nums1.length` and `0 <= j < k < nums2.length`.
+   * Type 2: Triplet (i, j, k) if `nums2[i]2 == nums1[j] * nums1[k]` where `0 <= i < nums2.length` and `0 <= j < k < nums1.length`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums1 = [7,4], nums2 = [5,2,8,9]
+     Output: 1
+     Explanation: Type 1: (1,1,2), nums1[1]^2 = nums2[1] * nums2[2]. (4^2 = 2 * 8). 
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums1 = [1,1], nums2 = [1,1,1]
+     Output: 9
+     Explanation: All Triplets are valid, because 1^2 = 1 * 1.
+     Type 1: (0,0,1), (0,0,2), (0,1,2), (1,0,1), (1,0,2), (1,1,2).  nums1[i]^2 = nums2[j] * nums2[k].
+     Type 2: (0,0,1), (1,0,1), (2,0,1). nums2[i]^2 = nums1[j] * nums1[k].
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: nums1 = [7,7,8,3], nums2 = [1,2,9,7]
+     Output: 2
+     Explanation: There are 2 valid triplets.
+     Type 1: (3,0,2).  nums1[3]^2 = nums2[0] * nums2[2].
+     Type 2: (3,0,1).  nums2[3]^2 = nums1[0] * nums1[1].
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: nums1 = [4,7,9,11,23], nums2 = [3,5,1024,12,18]
+     Output: 0
+     Explanation: There are no valid triplets.
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= nums1.length, nums2.length <= 1000`
+   * `1 <= nums1[i], nums2[i] <= 10^5`","function num_triplets(nums1::Vector{Int}, nums2::Vector{Int})
+    cnt1 = counter(nums1)
+    cnt2 = counter(nums2)
+    sqr_cnt1 = Dict(k ^ 2 => v for (k, v) in cnt1)
+    sqr_cnt2 = Dict(k ^ 2 => v for (k, v) in cnt2)
+    res = 0
+    for (k1, v1) in cnt1
+        for (k2, v2) in sqr_cnt2
+            if k1 ^ 2 == k2
+                res += (v1 - 1) * v1 * v2
+            else
+                res += cnt1[k2 ÷ k1] * v1 * v2     
+            end
+        end
+    end
+    for (k1, v1) in cnt2
+        for (k2, v2) in sqr_cnt1
+            if k2 % k1 == 0
+                if k1 ^ 2 == k2
+                    res += (v1 - 1) * v1 * v2
+                else
+                    res += cnt2[k2 ÷ k1] * v1 * v2
+                end
+            end
+        end
+    end
+    res ÷ 2
+end"
+"905. Sort Array By Parity
+ ---
+ 
+ Given an array `A` of non-negative integers, return an array consisting of all
+ the even elements of `A`, followed by all the odd elements of `A`.
+ 
+ You may return any answer array that satisfies this condition.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: [3,1,2,4]
+     Output: [2,4,3,1]
+     The outputs [4,2,3,1], [2,4,1,3], and [4,2,1,3] would also be accepted.
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `1 <= A.length <= 5000`
+   2. `0 <= A[i] <= 5000`","function sort_array_by_parity!(arr::Vector{Int})
+    i, j = 1, length(arr)
+    while i < j
+        if iseven(arr[i])
+            i += 1
+        else
+            arr[i], arr[j] = arr[j], arr[i]
+            j -= 1
+        end
+    end
+    return arr
+end"
+"73. Set Matrix Zeroes
+ ---
+ 
+ Given an ` _m_ x _n_` matrix. If an element is **0** , set its entire row and
+ column to **0**. Do it [**in-place**](https://en.wikipedia.org/wiki/In-
+ place_algorithm).
+ 
+ **Follow up:**
+ 
+   * A straight forward solution using O( _m_ _n_ ) space is probably a bad idea.
+   * A simple improvement uses O( _m_ \+ _n_ ) space, but still not the best solution.
+   * Could you devise a constant space solution?
+ 
+ 
+ 
+ **Example 1:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/08/17/mat1.jpg)
+ 
+     
+     
+     Input: matrix = [[1,1,1],[1,0,1],[1,1,1]]
+     Output: [[1,0,1],[0,0,0],[1,0,1]]
+     
+ 
+ **Example 2:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/08/17/mat2.jpg)
+ 
+     
+     
+     Input: matrix = [[0,1,2,0],[3,4,5,2],[1,3,1,5]]
+     Output: [[0,0,0,0],[0,4,5,0],[0,3,1,0]]
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `m == matrix.length`
+   * `n == matrix[0].length`
+   * `1 <= m, n <= 200`
+   * `-231 <= matrix[i][j] <= 231 - 1`","function set_zeroes(matrix::Vector{Vector{Int}})::Vector{Vector{Int}}
+    is_col = false
+    m, n = length(matrix), length(matrix[1])
+
+    for i = 1:m
+        matrix[i][1] == 0 && (is_col = true)
+
+        for j = 2:n
+            matrix[i][j] == 0 && (matrix[i][1] = matrix[1][j] = 0)
+        end
+    end
+
+    for i = 2:m, j = 2:n
+        (matrix[i][1] == 0 || matrix[1][j] == 0) && (matrix[i][j] = 0)
+    end
+
+    ## See if the first row needs to be set to zero as well
+    if matrix[1][1] == 0
+        for j = 1:n
+            matrix[1][j] = 0
+        end
+    end
+
+    ## See if the first column needs to be set to zero as well 
+    if is_col
+        for i = 1:m
+            matrix[i][1] = 0
+        end
+    end
+
+    return matrix
+end"
+"645. Set Mismatch
+ ---
+ 
+ The set `S` originally contains numbers from 1 to `n`. But unfortunately, due
+ to the data error, one of the numbers in the set got duplicated to **another**
+ number in the set, which results in repetition of one number and loss of
+ another number.
+ 
+ Given an array `nums` representing the data status of this set after the
+ error. Your task is to firstly find the number occurs twice and then find the
+ number that is missing. Return them in the form of an array.
+ 
+ **Example 1:**  
+ 
+     
+     
+     Input: nums = [1,2,2,4]
+     Output: [2,3]
+     
+ 
+ **Note:**  
+ 
+   1. The given array size will in the range [2, 10000].
+   2. The given array's numbers won't have any order.","function find_error_nums(nums::Vector{Int})
+    cnt = fill(0x0, length(nums))
+    for num in nums
+        cnt[num] += 1
+    end
+    return findfirst(==(0x2), cnt), findfirst(==(0x0), cnt)
+end"
+"1052. Grumpy Bookstore Owner
+ ---
+ 
+ Today, the bookstore owner has a store open for `customers.length` minutes.
+ Every minute, some number of customers (`customers[i]`) enter the store, and
+ all those customers leave after the end of that minute.
+ 
+ On some minutes, the bookstore owner is grumpy.  If the bookstore owner is
+ grumpy on the i-th minute, `grumpy[i] = 1`, otherwise `grumpy[i] = 0`.  When
+ the bookstore owner is grumpy, the customers of that minute are not satisfied,
+ otherwise they are satisfied.
+ 
+ The bookstore owner knows a secret technique to keep themselves not grumpy for
+ `x` minutes straight, but can only use it once.
+ 
+ Return the maximum number of customers that can be satisfied throughout the
+ day.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: customers = [1,0,1,2,1,1,7,5], grumpy = [0,1,0,1,0,1,0,1], x = 3
+     Output: 16
+     Explanation:  The bookstore owner keeps themselves not grumpy for the last 3 minutes. 
+     The maximum number of customers that can be satisfied = 1 + 1 + 1 + 1 + 7 + 5 = 16.
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   * `1 <= x <= customers.length == grumpy.length <= 20000`
+   * `0 <= customers[i] <= 1000`
+   * `0 <= grumpy[i] <= 1`","function max_satisfied(customers::Vector{Int}, grumpy::Vector{Int}, x::Int)
+    n = length(customers)
+    satisfied = sum(customers[1:x])
+
+    for i = (x+1):n
+        (grumpy[i] == 0) && (satisfied += customers[i])
+    end
+
+    current_satisfied = satisfied
+    left, right = 1, x + 1
+    while right <= n
+        (grumpy[left] == 1) && (current_satisfied -= customers[left])
+        (grumpy[right] == 1) && (current_satisfied += customers[right])
+
+        satisfied = max(current_satisfied, satisfied)
+        left, right = left + 1, right + 1
+    end
+
+    satisfied
+end"
+"509. Fibonacci Number
+ ---
+ 
+ The  **Fibonacci numbers** , commonly denoted `F(n)` form a sequence, called
+ the  **Fibonacci sequence** , such that each number is the sum of the two
+ preceding ones, starting from `0` and `1`. That is,
+ 
+     
+     
+     F(0) = 0,   F(1) = 1
+     F(N) = F(N - 1) + F(N - 2), for N > 1.
+     
+ 
+ Given `N`, calculate `F(N)`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: 2
+     Output: 1
+     Explanation: F(2) = F(1) + F(0) = 1 + 0 = 1.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: 3
+     Output: 2
+     Explanation: F(3) = F(2) + F(1) = 1 + 1 = 2.
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: 4
+     Output: 3
+     Explanation: F(4) = F(3) + F(2) = 2 + 1 = 3.
+     
+ 
+ 
+ 
+ **Note:**
+ 
+ 0 ≤ `N` ≤ 30.","function fib(n::Int)::Int
+    n <= 1 && return n
+    pre, cur = 0, 1
+    for _ in 2:n
+        pre, cur = cur, pre + cur
+    end
+    return cur
+end"
+"344. Reverse String
+ ---
+ 
+ Write a function that reverses a string. The input string is given as an array
+ of characters `char[]`.
+ 
+ Do not allocate extra space for another array, you must do this by **modifying
+ the input array  [in-place](https://en.wikipedia.org/wiki/In-
+ place_algorithm)** with O(1) extra memory.
+ 
+ You may assume all the characters consist of [printable ascii
+ characters](https://en.wikipedia.org/wiki/ASCIIPrintable_characters).
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: [""h"",""e"",""l"",""l"",""o""]
+     Output: [""o"",""l"",""l"",""e"",""h""]
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: [""H"",""a"",""n"",""n"",""a"",""h""]
+     Output: [""h"",""a"",""n"",""n"",""a"",""H""]","function reverse_string!(s::Vector{Char})::Nothing
+    n = length(s)
+    for i in 1:(n ÷ 2)
+        s[i], s[end - i + 1] = s[end - i + 1], s[i]
+    end
+    return nothing
+end"
+"852. Peak Index in a Mountain Array
+ ---
+ 
+ Let's call an array `arr` a **mountain**  if the following properties hold:
+ 
+   * `arr.length >= 3`
+   * There exists some `i` with `0 < i < arr.length - 1` such that: 
+     * `arr[0] < arr[1] < ... arr[i-1] < arr[i] `
+     * `arr[i] > arr[i+1] > ... > arr[arr.length - 1]`
+ 
+ Given an integer array arr that is **guaranteed** to be a mountain, return any
+ `i` such that `arr[0] < arr[1] < ... arr[i - 1] < arr[i] > arr[i + 1] > ... >
+ arr[arr.length - 1]`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: arr = [0,1,0]
+     Output: 1
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: arr = [0,2,1,0]
+     Output: 1
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: arr = [0,10,5,2]
+     Output: 1
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: arr = [3,4,5,1]
+     Output: 2
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: arr = [24,69,100,99,79,78,67,36,26,19]
+     Output: 2
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `3 <= arr.length <= 104`
+   * `0 <= arr[i] <= 106`
+   * `arr` is **guaranteed** to be a mountain array.","peak_index_in_mountain_array(arr) =
+    searchsortedfirst(1:(length(arr) - 1), length(arr) - 1; by=i -> arr[i] > arr[i + 1])"
+"435. Non-overlapping Intervals
+ ---
+ 
+ Given a collection of intervals, find the minimum number of intervals you need
+ to remove to make the rest of the intervals non-overlapping.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: [[1,2],[2,3],[3,4],[1,3]]
+     Output: 1
+     Explanation: [1,3] can be removed and the rest of intervals are non-overlapping.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: [[1,2],[1,2],[1,2]]
+     Output: 2
+     Explanation: You need to remove two [1,2] to make the rest of intervals non-overlapping.
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: [[1,2],[2,3]]
+     Output: 0
+     Explanation: You don't need to remove any of the intervals since they're already non-overlapping.
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. You may assume the interval's end point is always bigger than its start point.
+   2. Intervals like [1,2] and [2,3] have borders ""touching"" but they don't overlap each other.","function erase_overlap_intervals(intervals::Vector{Tuple{Int,Int}})
+    isempty(intervals) && return 0
+    sort!(intervals; by=x -> x[2])
+    lst, res = intervals[1][2], -1
+    for intv in intervals
+        intv[1] < lst ? res += 1 : lst = intv[2]
+    end
+    return res
+end"
+"1631. Path With Minimum Effort
+ ---
+ 
+ You are a hiker preparing for an upcoming hike. You are given `heights`, a 2D
+ array of size `rows x columns`, where `heights[row][col]` represents the
+ height of cell `(row, col)`. You are situated in the top-left cell, `(0, 0)`,
+ and you hope to travel to the bottom-right cell, `(rows-1, columns-1)` (i.e.,
+ **0-indexed** ). You can move **up** , **down** , **left** , or **right** ,
+ and you wish to find a route that requires the minimum **effort**.
+ 
+ A route's **effort** is the **maximum absolute difference** **** in heights
+ between two consecutive cells of the route.
+ 
+ Return _the minimum **effort** required to travel from the top-left cell to
+ the bottom-right cell._
+ 
+ 
+ 
+ **Example 1:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/10/04/ex1.png)
+ 
+     
+     
+     Input: heights = [[1,2,2],[3,8,2],[5,3,5]]
+     Output: 2
+     Explanation: The route of [1,3,5,3,5] has a maximum absolute difference of 2 in consecutive cells.
+     This is better than the route of [1,2,2,2,5], where the maximum absolute difference is 3.
+     
+ 
+ **Example 2:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/10/04/ex2.png)
+ 
+     
+     
+     Input: heights = [[1,2,3],[3,8,4],[5,3,5]]
+     Output: 1
+     Explanation: The route of [1,2,3,4,5] has a maximum absolute difference of 1 in consecutive cells, which is better than route [1,3,5,3,5].
+     
+ 
+ **Example 3:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/10/04/ex3.png)
+ 
+     
+     
+     Input: heights = [[1,2,1,1,1],[1,2,1,2,1],[1,2,1,2,1],[1,2,1,2,1],[1,1,1,2,1]]
+     Output: 0
+     Explanation: This route does not require any effort.
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `rows == heights.length`
+   * `columns == heights[i].length`
+   * `1 <= rows, columns <= 100`
+   * `1 <= heights[i][j] <= 106`","function minimum_effort_path(heights::Vector{Vector{Int}})
+    m, n = length(heights), length(heights[1])
+    ds = IntDisjointSets(m * n)
+    map = SortedMultiDict{Int, Pair{Int, Int}}()
+    for i in 1:m-1
+        for j in 1:n-1
+            insert!(map, abs(heights[i][j] - heights[i+1][j]), Pair((i - 1) * n + j, i * n + j))
+            insert!(map, abs(heights[i][j] - heights[i][j+1]), Pair((i - 1) * n + j, (i - 1) * n + j + 1))
+        end
+    end
+    for i in 1:m-1
+        insert!(map, abs(heights[i][n] - heights[i+1][n]), Pair(i * n, (i + 1) * n))
+    end
+    for j in 1:n-1
+        insert!(map, abs(heights[m][j] - heights[m][j+1]), Pair((m-1) * n + j, (m-1) * n + j + 1))
+    end
+    for (dist, edge) in map
+        union!(ds, edge.first, edge.second)
+        if in_same_set(ds, 1, m * n)
+            return dist
+        end
+    end
+end"
+"785. Is Graph Bipartite?
+ ---
+ 
+ Given an undirected `graph`, return `true` if and only if it is bipartite.
+ 
+ Recall that a graph is _bipartite_ if we can split its set of nodes into two
+ independent subsets A and B, such that every edge in the graph has one node in
+ A and another node in B.
+ 
+ The graph is given in the following form: `graph[i]` is a list of indexes `j`
+ for which the edge between nodes `i` and `j` exists.  Each node is an integer
+ between `0` and `graph.length - 1`.  There are no self edges or parallel
+ edges: `graph[i]` does not contain `i`, and it doesn't contain any element
+ twice.
+ 
+ 
+ 
+ **Example 1:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/10/21/bi1.jpg)
+ 
+     
+     
+     Input: graph = [[1,3],[0,2],[1,3],[0,2]]
+     Output: true
+     Explanation: We can divide the vertices into two groups: {0, 2} and {1, 3}.
+     
+     
+ 
+ **Example 2:**
+ 
+ ![](https://assets.leetcode.com/uploads/2020/10/21/bi2.jpg)
+ 
+     
+     
+     Input: graph = [[1,2,3],[0,2],[0,1,3],[0,2]]
+     Output: false
+     Explanation: We cannot find a way to divide the set of nodes into two independent subsets.
+     
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= graph.length <= 100`
+   * `0 <= graph[i].length < 100`
+   * `0 <= graph[i][j] <= graph.length - 1`
+   * `graph[i][j] != i`
+   * All the values of `graph[i]` are **unique**.
+   * The graph is **guaranteed** to be **undirected**.","function is_bipartite(graph::Vector{Vector{Int}})
+    for edge in graph
+        edge .+= 1
+    end
+    color = fill(0, length(graph))
+    q = Queue{Int}()
+    for i in 1:length(graph)
+        if color[i] != 0
+            continue
+        end
+        color[i] = 1
+        enqueue!(q, i)
+        while !isempty(q)
+            root = dequeue!(q)
+            for neighbor in graph[root]
+                if color[neighbor] == 0
+                    color[neighbor] = -color[root]
+                    enqueue!(q, neighbor)
+                elseif color[neighbor] == color[root]
+                    return false
+                end
+            end
+        end
+    end
+    return true
+end"
+"783. Minimum Distance Between BST Nodes
+ ---
+ 
+ Given a Binary Search Tree (BST) with the root node `root`, return the minimum
+ difference between the values of any two different nodes in the tree.
+ 
+ **Example :**
+ 
+     
+     
+     Input: root = [4,2,6,1,3,null,null]
+     Output: 1
+     Explanation:
+     Note that root is a TreeNode object, not an array.
+     
+     The given tree [4,2,6,1,3,null,null] is represented by the following diagram:
+     
+               4
+             /   \
+           2      6
+          / \    
+         1   3  
+     
+     while the minimum difference in this tree is 1, it occurs between node 1 and node 2, also between node 3 and node 2.
+     
+ 
+ **Note:**
+ 
+   1. The size of the BST will be between 2 and `100`.
+   2. The BST is always valid, each node's value is an integer, and each node's value is different.
+   3. This question is the same as 530: <https://leetcode.comhttps://leetcode.com/problems/minimum-absolute-difference-in-bst/>","function min_diff_in_bst(root::TreeNode)
+    prev, ans = typemin(Int) >> 1, typemax(Int)
+    function dfs(root::TreeNode)
+        (root.left !== nothing) && (dfs(root.left))
+        ans = min(root.val - prev, ans) 
+        prev = root.val
+        (root.right !== nothing) && (dfs(root.right))
+    end
+    dfs(root)
+    ans
+end"
+"1558. Minimum Numbers of Function Calls to Make Target Array
+ ---
+ 
+ ![](https://assets.leetcode.com/uploads/2020/07/10/sample_2_1887.png)
+ 
+ Your task is to form an integer array `nums` from an initial array of zeros
+ `arr` that is the same size as `nums`.
+ 
+ Return the minimum number of function calls to make `nums` from `arr`.
+ 
+ The answer is guaranteed to fit in a 32-bit signed integer.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums = [1,5]
+     Output: 5
+     Explanation: Increment by 1 (second element): [0, 0] to get [0, 1] (1 operation).
+     Double all the elements: [0, 1] -> [0, 2] -> [0, 4] (2 operations).
+     Increment by 1 (both elements)  [0, 4] -> [1, 4] -> **[1, 5]** (2 operations).
+     Total of operations: 1 + 2 + 2 = 5.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums = [2,2]
+     Output: 3
+     Explanation: Increment by 1 (both elements) [0, 0] -> [0, 1] -> [1, 1] (2 operations).
+     Double all the elements: [1, 1] -> **[2, 2]** (1 operation).
+     Total of operations: 2 + 1 = 3.
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: nums = [4,2,5]
+     Output: 6
+     Explanation: (initial)[0,0,0] -> [1,0,0] -> [1,0,1] -> [2,0,2] -> [2,1,2] -> [4,2,4] -> **[4,2,5]** (nums).
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: nums = [3,2,2,4]
+     Output: 7
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: nums = [2,4,8,16]
+     Output: 8
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= nums.length <= 10^5`
+   * `0 <= nums[i] <= 10^9`","function min_operations1558(nums::Vector{Int})
+    m = maximum(nums)
+    res = 0
+    for num in nums
+        while num > 0
+            num &= (num - 1) 
+            res += 1
+        end
+    end
+    while m > 1
+        m >>= 1
+        res += 1
+    end
+    res
+end"
+"991. Broken Calculator
+ ---
+ 
+ On a broken calculator that has a number showing on its display, we can
+ perform two operations:
+ 
+   * **Double** : Multiply the number on the display by 2, or;
+   * **Decrement** : Subtract 1 from the number on the display.
+ 
+ Initially, the calculator is displaying the number `X`.
+ 
+ Return the minimum number of operations needed to display the number `Y`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: X = 2, Y = 3
+     Output: 2
+     Explanation: Use double operation and then decrement operation {2 -> 4 -> 3}.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: X = 5, Y = 8
+     Output: 2
+     Explanation: Use decrement and then double {5 -> 4 -> 8}.
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: X = 3, Y = 10
+     Output: 3
+     Explanation: Use double, decrement and double {3 -> 6 -> 5 -> 10}.
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: X = 1024, Y = 1
+     Output: 1023
+     Explanation: Use decrement operations 1023 times.
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `1 <= X <= 10^9`
+   2. `1 <= Y <= 10^9`","function broken_calc(x::Integer, y::Integer)
+    cnt = 0
+    while x < y
+        isodd(y) ? (y += 1) : y >>= 1
+        cnt += 1
+    end
+    return cnt + x - y
+end"
+"1031. Maximum Sum of Two Non-Overlapping Subarrays
+ ---
+ 
+ Given an array `A` of non-negative integers, return the maximum sum of
+ elements in two non-overlapping (contiguous) subarrays, which have lengths `L`
+ and `M`.  (For clarification, the `L`-length subarray could occur before or
+ after the `M`-length subarray.)
+ 
+ Formally, return the largest `V` for which `V = (A[i] + A[i+1] + ... +
+ A[i+L-1]) + (A[j] + A[j+1] + ... + A[j+M-1])` and either:
+ 
+   * `0 <= i < i + L - 1 < j < j + M - 1 < A.length`, **or**
+   * `0 <= j < j + M - 1 < i < i + L - 1 < A.length`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: A = [0,6,5,2,2,5,1,9,4], L = 1, M = 2
+     Output: 20
+     Explanation: One choice of subarrays is [9] with length 1, and [6,5] with length 2.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: A = [3,8,1,3,2,1,8,9,0], L = 3, M = 2
+     Output: 29
+     Explanation: One choice of subarrays is [3,8,1] with length 3, and [8,9] with length 2.
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: A = [2,1,5,6,0,9,5,0,3,8], L = 4, M = 3
+     Output: 31
+     Explanation: One choice of subarrays is [5,6,0,9] with length 4, and [3,8] with length 3.
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. `L >= 1`
+   2. `M >= 1`
+   3. `L + M <= A.length <= 1000`
+   4. `0 <= A[i] <= 1000`","function window_sum(nums::Vector{Int}, l::Int)
+    res = fill(0, length(nums))
+    return window_sum!(res, nums, l)
+end
+
+function window_sum!(res::Vector{Int}, nums::Vector{Int}, l::Int)
+    res[1] = sum(@view(nums[1:l]))
+    cur_sum = res[1]
+    for i in 2:(length(nums) - l + 1)
+        cur_sum += nums[i + l - 1] - nums[i - 1]
+        res[i] = cur_sum
+    end
+    return res
+end
+
+function max_win_sum(nums::Vector{Int}, l::Int)
+    res = fill(0, length(nums))
+    return max_win_sum!(res, nums, l)
+end
+
+function max_win_sum!(res::Vector{Int}, nums::Vector{Int}, l::Int)
+    window_sum!(res, nums, l)
+    for i in (length(nums) - l):-1:1
+        res[i] = max(res[i], res[i + 1])
+    end
+    return res
+end
+
+function max_sum_two_no_overlap(nums::Vector{Int}, first_len::Int, second_len::Int)
+    n = length(nums)
+    tlen = first_len + second_len
+    flen_sums = window_sum(nums, first_len)
+    slen_sums = window_sum(nums, second_len)
+
+    fmax_win = max_win_sum(nums, first_len)
+    smax_win = max_win_sum(nums, second_len)
+    return max(
+        maximum(flen_sums[i] + smax_win[i + first_len] for i in 1:(n - tlen + 1)),
+        maximum(slen_sums[i] + fmax_win[i + second_len] for i in 1:(n - tlen + 1)),
+    )
+end"
+"393. UTF-8 Validation
+ ---
+ 
+ A character in UTF8 can be from **1 to 4 bytes** long, subjected to the
+ following rules:
+ 
+   1. For 1-byte character, the first bit is a 0, followed by its unicode code.
+   2. For n-bytes character, the first n-bits are all one's, the n+1 bit is 0, followed by n-1 bytes with most significant 2 bits being 10.
+ 
+ This is how the UTF-8 encoding would work:
+ 
+     
+     
+        Char. number range  |        UTF-8 octet sequence
+           (hexadecimal)    |              (binary)
+        --------------------+---------------------------------------------
+        0000 0000-0000 007F | 0xxxxxxx
+        0000 0080-0000 07FF | 110xxxxx 10xxxxxx
+        0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx
+        0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+     
+ 
+ Given an array of integers representing the data, return whether it is a valid
+ utf-8 encoding.
+ 
+ **Note:**  
+ The input is an array of integers. Only the **least significant 8 bits** of
+ each integer is used to store the data. This means each integer represents
+ only 1 byte of data.
+ 
+ **Example 1:**
+ 
+     
+     
+     data = [197, 130, 1], which represents the octet sequence: **11000101 10000010 00000001**.
+     
+     Return **true**.
+     It is a valid utf-8 encoding for a 2-bytes character followed by a 1-byte character.
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     data = [235, 140, 4], which represented the octet sequence: **11101011 10001100 00000100**.
+     
+     Return **false**.
+     The first 3 bits are all one's and the 4th bit is 0 means it is a 3-bytes character.
+     The next byte is a continuation byte which starts with 10 and that's correct.
+     But the second continuation byte does not start with 10, so it is invalid.","## Automation
+function valid_utf8(data::Vector{Int})::Bool
+    ## 1 represents 0xxx.., 2 represents 10xx.., 3,4,5 similarly, 6 represents error
+    switch(num::Int) = num >= 248 ? 6 : findfirst('0', bitstring(Int16(num))[(end - 7):end])
+    ## 1 represents start, 2 represents 2-byte(need one more byte), 3, 4 similarly, 5 represents fail
+    state = 1
+    state_shift = Dict{Int,Vector{Int}}(1 => [1, 5, 2, 3, 4, 5])
+    for i in 2:4
+        state_shift[i] = [5, i - 1, 5, 5, 5, 5]
+    end
+    for num in data
+        state = state_shift[state][switch(num)] ## new state
+        state == 5 && return false
+    end
+    return state == 1
+end"
+"162. Find Peak Element
+ ---
+ 
+ A peak element is an element that is strictly greater than its neighbors.
+ 
+ Given an integer array `nums`, find a peak element, and return its index. If
+ the array contains multiple peaks, return the index to **any of the peaks**.
+ 
+ You may imagine that `nums[-1] = nums[n] = -∞`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: nums = [1,2,3,1]
+     Output: 2
+     Explanation: 3 is a peak element and your function should return the index number 2.
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: nums = [1,2,1,3,5,6,4]
+     Output: 5
+     Explanation: Your function can return either index number 1 where the peak element is 2, or index number 5 where the peak element is 6.
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= nums.length <= 1000`
+   * `-231 <= nums[i] <= 231 - 1`
+   * `nums[i] != nums[i + 1]` for all valid `i`.
+ 
+ 
+ 
+ **Follow up:**  Could you implement a solution with logarithmic complexity?",find_peak_element(nums::Vector{Int}) = argmax(nums) - 1
+"1639. Number of Ways to Form a Target String Given a Dictionary
+ ---
+ 
+ You are given a list of strings of the **same length** `words` and a string
+ `target`.
+ 
+ Your task is to form `target` using the given `words` under the following
+ rules:
+ 
+   * `target` should be formed from left to right.
+   * To form the `ith` character ( **0-indexed** ) of `target`, you can choose the `kth` character of the `jth` string in `words` if `target[i] = words[j][k]`.
+   * Once you use the `kth` character of the `jth` string of `words`, you **can no longer** use the `xth` character of any string in `words` where `x <= k`. In other words, all characters to the left of or at index `k` become unusuable for every string.
+   * Repeat the process until you form the string `target`.
+ 
+ **Notice**  that you can use **multiple characters** from the **same string**
+ in `words` provided the conditions above are met.
+ 
+ Return _the number of ways to form`target` from `words`_. Since the answer may
+ be too large, return it **modulo** `109 + 7`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: words = [""acca"",""bbbb"",""caca""], target = ""aba""
+     Output: 6
+     Explanation: There are 6 ways to form target.
+     ""aba"" -> index 0 ("" _a_ cca""), index 1 (""b _b_ bb""), index 3 (""cac _a_ "")
+     ""aba"" -> index 0 ("" _a_ cca""), index 2 (""bb _b_ b""), index 3 (""cac _a_ "")
+     ""aba"" -> index 0 ("" _a_ cca""), index 1 (""b _b_ bb""), index 3 (""acc _a_ "")
+     ""aba"" -> index 0 ("" _a_ cca""), index 2 (""bb _b_ b""), index 3 (""acc _a_ "")
+     ""aba"" -> index 1 (""c _a_ ca""), index 2 (""bb _b_ b""), index 3 (""acc _a_ "")
+     ""aba"" -> index 1 (""c _a_ ca""), index 2 (""bb _b_ b""), index 3 (""cac _a_ "")
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: words = [""abba"",""baab""], target = ""bab""
+     Output: 4
+     Explanation: There are 4 ways to form target.
+     ""bab"" -> index 0 ("" _b_ aab""), index 1 (""b _a_ ab""), index 2 (""ab _b_ a"")
+     ""bab"" -> index 0 ("" _b_ aab""), index 1 (""b _a_ ab""), index 3 (""baa _b_ "")
+     ""bab"" -> index 0 ("" _b_ aab""), index 2 (""ba _a_ b""), index 3 (""baa _b_ "")
+     ""bab"" -> index 1 (""a _b_ ba""), index 2 (""ba _a_ b""), index 3 (""baa _b_ "")
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: words = [""abcd""], target = ""abcd""
+     Output: 1
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: words = [""abab"",""baba"",""abba"",""baab""], target = ""abba""
+     Output: 16
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= words.length <= 1000`
+   * `1 <= words[i].length <= 1000`
+   * All strings in `words` have the same length.
+   * `1 <= target.length <= 1000`
+   * `words[i]` and `target` contain only lowercase English letters.","function num_ways(word::Vector{String}, target::String)
+    len_t, len_s, len_w = length(target), length(word[1]), length(word)
+    dp, cntr = fill(0, len_t, len_s), fill(0, len_s, 128)
+
+    for i in 1:len_s
+        for s in word
+            cntr[i, s[i] |> Int] += 1
+        end
+    end
+    for i in 1:len_s-len_t+1
+        dp[1, i] = cntr[i, target[1] |> Int]
+    end
+    for i in 2:len_t
+        acc = 0
+        for j in i:i+len_s-len_t
+            mul = cntr[j, target[i] |> Int]
+            acc += dp[i - 1, j - 1]
+            dp[i, j] = acc * mul % 1000000007
+        end
+    end
+    ## display(dp)
+    sum(dp[len_t, len_t:end]) % 1000000007
+end"
+"165. Compare Version Numbers
+ ---
+ 
+ Given two version numbers, `version1` and `version2`, compare them.
+ 
+ Version numbers consist of **one or more revisions** joined by a dot `'.'`.
+ Each revision consists of **digits**  and may contain leading **zeros**. Every
+ revision contains **at least one character**. Revisions are **0-indexed from
+ left to right** , with the leftmost revision being revision 0, the next
+ revision being revision 1, and so on. For example `2.5.33` and `0.1` are valid
+ version numbers.
+ 
+ To compare version numbers, compare their revisions in **left-to-right
+ order**. Revisions are compared using their  **integer value ignoring any
+ leading zeros**. This means that revisions `1` and `001` are considered
+ **equal**. If a version number does not specify a revision at an index, then
+ **treat the revision as  `0`**. For example, version `1.0` is less than
+ version `1.1` because their revision 0s are the same, but their revision 1s
+ are `0` and `1` respectively, and `0 < 1`.
+ 
+ _Return the following:_
+ 
+   * If `version1 < version2`, return `-1`.
+   * If `version1 > version2`, return `1`.
+   * Otherwise, return `0`.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: version1 = ""1.01"", version2 = ""1.001""
+     Output: 0
+     Explanation: Ignoring leading zeroes, both ""01"" and ""001"" represent the same integer ""1"".
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: version1 = ""1.0"", version2 = ""1.0.0""
+     Output: 0
+     Explanation: version1 does not specify revision 2, which means it is treated as ""0"".
+     
+ 
+ **Example 3:**
+ 
+     
+     
+     Input: version1 = ""0.1"", version2 = ""1.1""
+     Output: -1
+     Explanation:  version1's revision 0 is ""0"", while version2's revision 0 is ""1"". 0 < 1, so version1 < version2.
+     
+ 
+ **Example 4:**
+ 
+     
+     
+     Input: version1 = ""1.0.1"", version2 = ""1""
+     Output: 1
+     
+ 
+ **Example 5:**
+ 
+     
+     
+     Input: version1 = ""7.5.2.4"", version2 = ""7.5.3""
+     Output: -1
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * `1 <= version1.length, version2.length <= 500`
+   * `version1` and `version2` only contain digits and `'.'`.
+   * `version1` and `version2`  **are valid version numbers**.
+   * All the given revisions in `version1` and `version2` can be stored in a  **32-bit integer**.","function compare_version(version1::String, version2::String)
+    s_v1 = parse.(Int, split(version1, "".""))
+    s_v2 = parse.(Int, split(version2, "".""))
+    if length(s_v1) > length(s_v2)
+        append!(s_v2, fill(0, length(s_v1) - length(s_v2)))
+    else
+        append!(s_v1, fill(0, length(s_v2) - length(s_v1)))
+    end    
+    for i in 1:length(s_v1)
+        if s_v1 > s_v2
+            return 1
+        elseif s_v1 < s_v2
+            return -1
+        end        
+    end
+    return 0
+end"
+"164. Maximum Gap
+ ---
+ 
+ Given an unsorted array, find the maximum difference between the successive
+ elements in its sorted form.
+ 
+ Return 0 if the array contains less than 2 elements.
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: [3,6,9,1]
+     Output: 3
+     Explanation: The sorted form of the array is [1,3,6,9], either
+                  (3,6) or (6,9) has the maximum difference 3.
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: [10]
+     Output: 0
+     Explanation: The array contains less than 2 elements, therefore return 0.
+ 
+ **Note:**
+ 
+   * You may assume all elements in the array are non-negative integers and fit in the 32-bit signed integer range.
+   * Try to solve it in linear time/space.","function maximum_gap(nums::Vector{Int})::Int
+    sort!(nums)
+    return length(nums) < 2 ? 0 : maximum(@view(nums[2:end]) - @view(nums[1:(end - 1)]))
+end"
+"643. Maximum Average Subarray I
+ ---
+ 
+ Given an array consisting of `n` integers, find the contiguous subarray of
+ given length `k` that has the maximum average value. And you need to output
+ the maximum average value.
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: [1,12,-5,-6,50,3], k = 4
+     Output: 12.75
+     Explanation: Maximum average is (12-5-6+50)/4 = 51/4 = 12.75
+     
+ 
+ 
+ 
+ **Note:**
+ 
+   1. 1 <= `k` <= `n` <= 30,000.
+   2. Elements of the given array will be in the range [-10,000, 10,000].","function find_max_average(nums::Vector{Int}, K::Int)
+    res = sum(@view(nums[1:K]))
+    tmp = res
+    i, j = 1, K + 1
+    while j ≤ length(nums)
+        tmp += nums[j] - nums[i]
+        res = max(tmp, res)
+        i += 1
+        j += 1
+    end
+    res / K
+end"
+"1103. Distribute Candies to People
+ ---
+ 
+ We distribute some number of `candies`, to a row of **`n = num_people`**
+ people in the following way:
+ 
+ We then give 1 candy to the first person, 2 candies to the second person, and
+ so on until we give `n` candies to the last person.
+ 
+ Then, we go back to the start of the row, giving `n + 1` candies to the first
+ person, `n + 2` candies to the second person, and so on until we give `2 * n`
+ candies to the last person.
+ 
+ This process repeats (with us giving one more candy each time, and moving to
+ the start of the row after we reach the end) until we run out of candies.  The
+ last person will receive all of our remaining candies (not necessarily one
+ more than the previous gift).
+ 
+ Return an array (of length `num_people` and sum `candies`) that represents the
+ final distribution of candies.
+ 
+ 
+ 
+ **Example 1:**
+ 
+     
+     
+     Input: candies = 7, num_people = 4
+     Output: [1,2,3,1]
+     Explanation:
+     On the first turn, ans[0] += 1, and the array is [1,0,0,0].
+     On the second turn, ans[1] += 2, and the array is [1,2,0,0].
+     On the third turn, ans[2] += 3, and the array is [1,2,3,0].
+     On the fourth turn, ans[3] += 1 (because there is only one candy left), and the final array is [1,2,3,1].
+     
+ 
+ **Example 2:**
+ 
+     
+     
+     Input: candies = 10, num_people = 3
+     Output: [5,2,3]
+     Explanation:
+     On the first turn, ans[0] += 1, and the array is [1,0,0].
+     On the second turn, ans[1] += 2, and the array is [1,2,0].
+     On the third turn, ans[2] += 3, and the array is [1,2,3].
+     On the fourth turn, ans[0] += 4, and the final array is [5,2,3].
+     
+ 
+ 
+ 
+ **Constraints:**
+ 
+   * 1 <= candies <= 10^9
+   * 1 <= num_people <= 1000","function distribute_candies(candies::Int, npeople::Int)
+    res = fill(0, npeople)
+    cur = 1
+    while candies != 0
+        tmp = min(cur, candies)
+        res[mod1(cur, npeople)] += tmp
+        candies -= tmp
+        cur += 1
+    end
+    return res
+end"
+"790. Domino and Tromino Tiling
+ ---
+ 
+ We have two types of tiles: a 2x1 domino shape, and an ""L"" tromino shape.
+ These shapes may be rotated.
+ 
+     
+     
+     XX  <- domino
+     
+     XX  <- ""L"" tromino
+     X
+     
+ 
+ Given N, how many ways are there to tile a 2 x N board? **Return your answer
+ modulo 10^9 + 7**.
+ 
+ (In a tiling, every square must be covered by a tile. Two tilings are
+ different if and only if there are two 4-directionally adjacent cells on the
+ board such that exactly one of the tilings has both squares occupied by a
+ tile.)
+ 
+     
+     
+     **Example:**
+     Input: 3
+     Output: 5
+     Explanation: 
+     The five different ways are listed below, different letters indicates different tiles:
+     XYZ XXZ XYY XXY XYY
+     XYZ YYZ XZZ XYY XXY
+ 
+ **Note:**
+ 
+   * N  will be in range `[1, 1000]`.","function num_tilings(N::Int)
+    f0, f1= 1, 1
+    g0, g1 = 0, 1
+    for i in 1:N-1
+        f0, f1, g0, g1 = f1, f0 + f1 + 2 * g0, g1, g1 + f1
+    end
+    f1
+end"
